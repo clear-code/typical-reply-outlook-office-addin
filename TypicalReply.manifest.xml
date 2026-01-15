@@ -18,7 +18,7 @@
   </Description>
   <IconUrl DefaultValue="https://127.0.0.1:10042/assets/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://127.0.0.1:10042/assets/icon-128.png"/>
-  <SupportUrl DefaultValue="https://github.com/TypicalReply/Outlook-Office-Addin"/>
+  <SupportUrl DefaultValue="https://github.com/clear-code/typical-reply-outlook-office-addin"/>
   <AppDomains>
     <AppDomain>https://127.0.0.1:10042</AppDomain>
   </AppDomains>
@@ -59,13 +59,6 @@
           </Runtimes>
           <DesktopFormFactor>
             <FunctionFile resid="residUILessFunctionFileUrl" />
-            <ExtensionPoint xsi:type="LaunchEvent">
-              <LaunchEvents>
-                <LaunchEvent Type="OnNewMessageRead" FunctionName="onNewMessageReadCreated"/>
-                <LaunchEvent Type="OnAppointmentOrganizer" FunctionName="onAppointmentOrganizer"/>
-              </LaunchEvents>
-              <SourceLocation resid="residUILessFunctionFileUrl"/>
-            </ExtensionPoint>
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="msgReadTabDefault">
                 <Group id="msgReadCmdGroup">
