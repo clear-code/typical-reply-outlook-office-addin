@@ -8,34 +8,35 @@ Copyright (c) 2026 ClearCode Inc.
 //import { ConfigLoader } from "./config-loader.mjs";
 
 let locale;
+let language;
 
 Office.onReady(() => {
-  const language = Office.context.displayLanguage;
+  language = Office.context.displayLanguage;
   document.documentElement.setAttribute("lang", language);
 });
 
 function createNewMail() {
-    try {
-        const currentItemId = Office.context.mailbox.item.itemId;
-        Office.context.mailbox.displayNewMessageFormAsync(
-          {
-            toRecipients: Office.context.mailbox.item.to, // Copies the To line from current item
-            ccRecipients: ["sam@contoso.com"],
-            subject: "Outlook add-ins are cool!",
-            htmlBody: 'Hello <b>World</b>!<br/><img src="cid:image.png"></i>',
-            attachments: [{
-              name: "hoge",
-              type: Office.MailboxEnums.AttachmentType.Item,
-              itemId: currentItemId
-            }]
-          }
-        );
-    } catch (e) {
-        console.log("createNewMail Failed:", e);
-    }
+  try {
+    const currentItemId = Office.context.mailbox.item.itemId;
+    Office.context.mailbox.displayNewMessageFormAsync({
+      toRecipients: Office.context.mailbox.item.to, // Copies the To line from current item
+      ccRecipients: ["sam@contoso.com"],
+      subject: "Outlook add-ins are cool!",
+      htmlBody: 'Hello <b>World</b>!<br/><img src="cid:image.png"></i>',
+      attachments: [
+        {
+          name: Office.context.mailbox.item.subject,
+          type: Office.MailboxEnums.AttachmentType.Item,
+          itemId: currentItemId,
+        },
+      ],
+    });
+  } catch (e) {
+    console.log("createNewMail Failed:", e);
+  }
 }
 
-async function onTypicalReplyButtonClicked(event) {
+async function onTypicalReplyButtonClicked() {
   createNewMail();
 }
 window.onTypicalReplyButtonClicked = onTypicalReplyButtonClicked;
