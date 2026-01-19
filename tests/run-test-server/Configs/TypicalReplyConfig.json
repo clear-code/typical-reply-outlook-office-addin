@@ -1,0 +1,42 @@
+{
+    "ConfigList": [
+        {
+            "Culture": "ja-JP",
+            "GroupLabel": "定型返信",
+            "ButtonConfigList": [
+                {
+                    "Id": "msgReadTypicalReply",
+                    "Label": "いいね！",
+                    "SubjectPrefix": "[[いいね！]]",
+                    "Body": "いいね！",
+                    "Recipients": [
+                        "all"
+                    ],
+                    "QuoteType": true,
+                    "AllowedDomains": [
+                        "*"
+                    ]
+                }
+            ]
+        },
+        {
+            "Culture": "en",
+            "GroupLabel": "Typical Reply",
+            "ButtonConfigList": [
+                {
+                    "Id": "msgReadTypicalReply",
+                    "Label": "Like!",
+                    "SubjectPrefix": "[[Like!]]",
+                    "Body": "Like!",
+                    "Recipients": [
+                        "all"
+                    ],
+                    "QuoteType": true,
+                    "AllowedDomains": [
+                        "*"
+                    ]
+                }
+            ]
+        }
+    ]
+}

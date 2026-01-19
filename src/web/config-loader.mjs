@@ -6,7 +6,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Copyright (c) 2025 ClearCode Inc.
 */
 
-import { Config } from "./config.mjs";
+import { TypicalReplyConfig } from "./config.mjs";
 
 export class ConfigLoader {
   static async loadFile(url) {
@@ -29,8 +29,21 @@ export class ConfigLoader {
     const configJsonString = await this.loadFile("configs/TypicalReplyConfig.json");
     if (configJsonString) {
       const configObject = JSON.parse(configJsonString);
-      return new Config(configObject);
+      return new TypicalReplyConfig(configObject);
     }
-    return new Config({});
+    return new TypicalReplyConfig({});
+  }
+
+  static async loadConfigForCurrentLanguage(culture) {
+    const typicalReplyConfig = await ConfigLoader.loadFileConfig();
+    let config = typicalReplyConfig?.ConfigList?.find((_) => (_.Culture ?? null) === culture);
+    if (!config) {
+      const lang = culture.split("-")[0];
+      config = typicalReplyConfig?.ConfigList?.find((_) => (_.Culture ?? null) === lang);
+    }
+    if (!config) {
+      config = typicalReplyConfig?.ConfigList?.[0];
+    }
+    return config;
   }
 }
