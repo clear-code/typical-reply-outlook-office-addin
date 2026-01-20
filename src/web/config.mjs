@@ -26,12 +26,6 @@ export class ButtonConfigEnums {
     All: 1,
     SpecifiedByUser: 2,
   };
-
-  static ButtonSize = {
-    Unknown: 0,
-    Normal: 1,
-    Large: 2,
-  };
 }
 
 export class ButtonConfig {
@@ -47,7 +41,6 @@ export class ButtonConfig {
   LoweredAllowedDomains;
   AllowedDomainsType;
   ForwardType;
-  Size;
   Image;
 
   constructor({
@@ -60,7 +53,6 @@ export class ButtonConfig {
     QuoteType,
     AllowedDomains,
     ForwardType,
-    Size,
     Image,
   }) {
     this.Id = Id ?? "";
@@ -72,7 +64,6 @@ export class ButtonConfig {
     this.QuoteType = QuoteType ?? false;
     this.AllowedDomains = AllowedDomains ?? [];
     this.ForwardType = ForwardType ?? ButtonConfigEnums.ForwardType.Unknown;
-    this.Size = Size ?? ButtonConfigEnums.ButtonSize.Unknown;
     this.Image = Image ?? "logo.png";
 
     if (!Recipients || Recipients.length == 0) {
@@ -100,24 +91,15 @@ export class ButtonConfig {
 export class Config {
   Culture;
   GroupLabel;
-  TabMailInsertAfterMso;
-  TabReadInsertAfterMso;
-  ContextMenuInsertAfterMso;
   ButtonConfigList;
 
   constructor({
     Culture,
     GroupLabel,
-    TabMailInsertAfterMso,
-    TabReadInsertAfterMso,
-    ContextMenuInsertAfterMso,
     ButtonConfigList,
   }) {
     this.Culture = Culture ?? "en-US";
     this.GroupLabel = GroupLabel ?? "Typical Reply";
-    this.TabMailInsertAfterMso = TabMailInsertAfterMso ?? "GroupMailRespond";
-    this.TabReadInsertAfterMso = TabReadInsertAfterMso ?? "GroupRespond";
-    this.ContextMenuInsertAfterMso = ContextMenuInsertAfterMso ?? "Forward";
     this.ButtonConfigList = [];
     if (ButtonConfigList) {
       for (const buttonConfig of ButtonConfigList) {

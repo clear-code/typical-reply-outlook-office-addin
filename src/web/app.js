@@ -7,64 +7,77 @@ Copyright (c) 2026 ClearCode Inc.
 */
 import { ConfigLoader } from "./config-loader.mjs";
 import { MailDataCreator } from "./mail-data-creator.mjs";
+import { OfficeDataAccessHelper } from "./office-data-access-helper.mjs";
 
 Office.onReady(() => {});
 
-// function createNewMail() {
-//   try {
-//     const currentItemId = Office.context.mailbox.item.itemId;
-//     MailDataCreator.CreateReplyMailData();
-//     Office.context.mailbox.displayNewMessageFormAsync({
-//       toRecipients: Office.context.mailbox.item.to, // Copies the To line from current item
-//       ccRecipients: ["sam@contoso.com"],
-//       subject: "Outlook add-ins are cool!",
-//       htmlBody: 'Hello <b>World</b>!<br/><img src="cid:image.png"></i>',
-//       attachments: [
-//         {
-//           name: Office.context.mailbox.item.subject,
-//           type: Office.MailboxEnums.AttachmentType.Item,
-//           itemId: currentItemId,
-//         },
-//       ],
-//     });
-//   } catch (e) {
-//     console.log("createNewMail Failed:", e);
-//   }
-// }
-
 async function onTypicalReplyButtonClicked(event) {
   const actionId = event.source.id; 
-  console.log(actionId);
-  const config = await ConfigLoader.loadConfigForCurrentLanguage(Office.context.displayLanguage);
+  console.debug("actionId: " + actionId);
+  console.debug("conversationId: " + Office.context.mailbox.item.conversationId);
   const originalMailData = {
     toRecipients: Office.context.mailbox.item.to,
     ccRecipients: Office.context.mailbox.item.cc,
     bccRecipients: Office.context.mailbox.item.bcc,
     sender: Office.context.mailbox.item.sender,
-    body: Office.context.mailbox.item.body,
     subject: Office.context.mailbox.item.subject,
     id: Office.context.mailbox.item.itemId,
   };
   try {
-    const waitComplete = false;
-    for(const buttonConfig of config.ButtonConfigList) {
-      if (actionId !== buttonConfig.Id) {
-        continue;
-      }
-      const replyMailData = MailDataCreator.CreateReplyMailData({ config: config.ButtonConfigList[0], originalMailData });
-      Office.context.mailbox.displayNewMessageFormAsync(replyMailData);
-      // displayNewMessageFormAsync will be canceled if event.completed() is called
-      // before finishing displayNewMessageFormAsync. The event will be completed 
-      // automatically after displayNewMessageFormAsync is called.
-      waitComplete = true;
-      break;
+    const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(Office.context.displayLanguage, actionId);
+    if (!buttonConfig) {
+      console.log("no button config find.")
+      return event.completed();
     }
-    if(!waitComplete) {
+    const replyMailData = MailDataCreator.CreateDataOnForReplyForm({ config: buttonConfig, originalMailData });
+    if (!replyMailData) {
+      console.log("failed to create reply mail data.")
+      return event.completed();
+    }
+    Office.context.roamingSettings.set("conversationId", Office.context.mailbox.item.conversationId ?? "");
+    Office.context.roamingSettings.set("actionId", actionId);
+    await OfficeDataAccessHelper.saveRoamingSettingsAsync();
+    replyMailData.executeMethod({attachments: replyMailData.attachments, callback: () => {
       event.completed();
-    }
+    }});
   } catch (e) {
     console.log("createNewMail Failed:", e);
+    event.completed();
   }
 }
 window.onTypicalReplyButtonClicked = onTypicalReplyButtonClicked;
+
+async function onNewMessageComposeCreated(event) {
+  const conversationId =  Office.context.mailbox.item.conversationId;
+  const actionId = Office.context.roamingSettings.get("actionId")?.trim() ?? "";
+  const targetConversationId = Office.context.roamingSettings.get("conversationId")?.trim() ?? "";
+  console.debug("action id: " + actionId);
+  console.debug("targetConversation id: " + targetConversationId);
+  if (conversationId !== targetConversationId) {
+    return event.completed();
+  }
+  const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(Office.context.displayLanguage, actionId);
+  Office.context.roamingSettings.remove("conversationId");
+  Office.context.roamingSettings.remove("actionId");
+  await OfficeDataAccessHelper.saveRoamingSettingsAsync();
+
+  const currentSubject = await OfficeDataAccessHelper.getSubjectAsync();
+  const data = MailDataCreator.CreateReplyMailData({config: buttonConfig, currentSubject});
+  if (data.newToRecipients) {
+    await OfficeDataAccessHelper.setToAsync(data.newToRecipients);
+  }
+  await OfficeDataAccessHelper.setSubjectAsync(data.subject);
+  let body = "";
+  if (data.quoteType) {
+    body = await OfficeDataAccessHelper.getBodyAsync();
+  }
+  if (data.bodyHtml) {
+    body = data.bodyHtml + "\n\n" + body;
+  }
+  await OfficeDataAccessHelper.setBodyAsync(body);
+  event.completed();
+}
+window.onNewMessageComposeCreated = onNewMessageComposeCreated;
+
+Office.actions.associate("onNewMessageComposeCreated", onNewMessageComposeCreated);
 Office.actions.associate("onTypicalReplyButtonClicked", onTypicalReplyButtonClicked);
