@@ -59,6 +59,12 @@
           </Runtimes>
           <DesktopFormFactor>
             <FunctionFile resid="residUILessFunctionFileUrl" />
+            <ExtensionPoint xsi:type="LaunchEvent">
+              <LaunchEvents>
+                <LaunchEvent Type="OnNewMessageCompose" FunctionName="onNewMessageComposeCreated"/>
+              </LaunchEvents>
+              <SourceLocation resid="residUILessFunctionFileUrl"/>
+            </ExtensionPoint>
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="msgReadTabDefault">
                 <Group id="msgReadCmdGroup">

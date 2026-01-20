@@ -13,6 +13,7 @@
                         "all"
                     ],
                     "QuoteType": true,
+                    "RecipientsType": 3,
                     "AllowedDomains": [
                         "*"
                     ]

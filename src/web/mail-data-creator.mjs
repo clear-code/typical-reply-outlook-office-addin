@@ -9,24 +9,26 @@ import { ButtonConfigEnums } from "./config.mjs";
 import * as RecipientParser from "./recipient-parser.mjs";
 
 export class MailDataCreator {
-  static CreateReplyMailData({ config, originalMailData }) {
+  static CreateDataOnForReplyForm({ config, originalMailData }) {
     const mailItemToReply = {};
     switch (config.RecipientsType) {
       case ButtonConfigEnums.RecipientsType.All:
+        mailItemToReply.executeMethod = Office.context.mailbox.item.displayReplyAllFormAsync;
         mailItemToReply.toRecipients = originalMailData.toRecipients;
         mailItemToReply.ccRecipients = originalMailData.ccRecipients;
         mailItemToReply.bccRecipients = originalMailData.bccRecipients;
         break;
       case ButtonConfigEnums.RecipientsType.Sender:
+        mailItemToReply.executeMethod = Office.context.mailbox.item.displayReplyFormAsync;
         mailItemToReply.toRecipients = originalMailData.sender;
         break;
       case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
+        mailItemToReply.executeMethod = Office.context.mailbox.item.displayReplyFormAsync;
         mailItemToReply.toRecipients = config.Recipients;
         break;
       default:
-        break;
+        break; 
     }
-
     if (config.AllowedDomainsType == ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser) {
       const loweredAllowedDomains = config.AllowedDomains.toLowerCase();
       for (const recipient of [
@@ -42,27 +44,6 @@ export class MailDataCreator {
         return null;
       }
     }
-
-    if (config.Subject) {
-      mailItemToReply.subject = config.Subject;
-    }
-
-    if (config.SubjectPrefix) {
-      mailItemToReply.subject = `${config.SubjectPrefix} ${mailItemToReply.subject}`;
-    }
-
-    const replyMessage = "";
-
-    // The quote function is not supported yet.
-    // if (config.QuoteType && !selectedMailItem.Body)
-    // {
-    // }
-
-    mailItemToReply.bodyHtml = config.Body ?? "";
-    if (replyMessage) {
-      mailItemToReply.bodyHtml += replyMessage;
-    }
-
     switch (config.ForwardType) {
       case ButtonConfigEnums.ForwardType.Attachment:
         mailItemToReply.attachments = [
@@ -83,7 +64,31 @@ export class MailDataCreator {
         ];
         break;
     }
+    return mailItemToReply;
+  }
+  static CreateReplyMailData({ config, originalSuject }) {
+    const mailItemToReply = {};
+    switch (config.RecipientsType) {
+      case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
+        mailItemToReply.newToRecipients = config.Recipients;
+        break;
+      default:
+        break;
+    }
 
+    if (config.Subject) {
+      mailItemToReply.subject = config.Subject;
+    }
+    else {
+      mailItemToReply.subject = originalSuject;
+    }
+
+    if (config.SubjectPrefix) {
+      mailItemToReply.subject = `${config.SubjectPrefix} ${mailItemToReply.subject ?? ""}`;
+    }
+
+    mailItemToReply.bodyHtml = config.Body ?? "";
+    mailItemToReply.quoteType = config.QuoteType
     return mailItemToReply;
   }
 }
