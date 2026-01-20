@@ -12,7 +12,7 @@ import { OfficeDataAccessHelper } from "./office-data-access-helper.mjs";
 Office.onReady(() => {});
 
 async function onTypicalReplyButtonClicked(event) {
-  const actionId = event.source.id; 
+  const actionId = event.source.id;
   console.debug("actionId: " + actionId);
   console.debug("conversationId: " + Office.context.mailbox.item.conversationId);
   const originalMailData = {
@@ -24,22 +24,34 @@ async function onTypicalReplyButtonClicked(event) {
     id: Office.context.mailbox.item.itemId,
   };
   try {
-    const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(Office.context.displayLanguage, actionId);
+    const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(
+      Office.context.displayLanguage,
+      actionId
+    );
     if (!buttonConfig) {
-      console.log("no button config find.")
+      console.log("no button config find.");
       return event.completed();
     }
-    const replyMailData = MailDataCreator.CreateDataOnForReplyForm({ config: buttonConfig, originalMailData });
+    const replyMailData = MailDataCreator.CreateDataOnForReplyForm({
+      config: buttonConfig,
+      originalMailData,
+    });
     if (!replyMailData) {
-      console.log("failed to create reply mail data.")
+      console.log("failed to create reply mail data.");
       return event.completed();
     }
-    Office.context.roamingSettings.set("conversationId", Office.context.mailbox.item.conversationId ?? "");
+    Office.context.roamingSettings.set(
+      "conversationId",
+      Office.context.mailbox.item.conversationId ?? ""
+    );
     Office.context.roamingSettings.set("actionId", actionId);
     await OfficeDataAccessHelper.saveRoamingSettingsAsync();
-    replyMailData.executeMethod({attachments: replyMailData.attachments, callback: () => {
-      event.completed();
-    }});
+    replyMailData.executeMethod({
+      attachments: replyMailData.attachments,
+      callback: () => {
+        event.completed();
+      },
+    });
   } catch (e) {
     console.log("createNewMail Failed:", e);
     event.completed();
@@ -48,7 +60,7 @@ async function onTypicalReplyButtonClicked(event) {
 window.onTypicalReplyButtonClicked = onTypicalReplyButtonClicked;
 
 async function onNewMessageComposeCreated(event) {
-  const conversationId =  Office.context.mailbox.item.conversationId;
+  const conversationId = Office.context.mailbox.item.conversationId;
   const actionId = Office.context.roamingSettings.get("actionId")?.trim() ?? "";
   const targetConversationId = Office.context.roamingSettings.get("conversationId")?.trim() ?? "";
   console.debug("action id: " + actionId);
@@ -56,13 +68,16 @@ async function onNewMessageComposeCreated(event) {
   if (conversationId !== targetConversationId) {
     return event.completed();
   }
-  const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(Office.context.displayLanguage, actionId);
+  const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(
+    Office.context.displayLanguage,
+    actionId
+  );
   Office.context.roamingSettings.remove("conversationId");
   Office.context.roamingSettings.remove("actionId");
   await OfficeDataAccessHelper.saveRoamingSettingsAsync();
 
   const currentSubject = await OfficeDataAccessHelper.getSubjectAsync();
-  const data = MailDataCreator.CreateReplyMailData({config: buttonConfig, currentSubject});
+  const data = MailDataCreator.CreateReplyMailData({ config: buttonConfig, currentSubject });
   if (data.newToRecipients) {
     await OfficeDataAccessHelper.setToAsync(data.newToRecipients);
   }

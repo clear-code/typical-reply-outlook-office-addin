@@ -27,7 +27,7 @@ export class MailDataCreator {
         mailItemToReply.toRecipients = config.Recipients;
         break;
       default:
-        break; 
+        break;
     }
     if (config.AllowedDomainsType == ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser) {
       const loweredAllowedDomains = config.AllowedDomains.toLowerCase();
@@ -78,8 +78,7 @@ export class MailDataCreator {
 
     if (config.Subject) {
       mailItemToReply.subject = config.Subject;
-    }
-    else {
+    } else {
       mailItemToReply.subject = originalSuject;
     }
 
@@ -88,7 +87,7 @@ export class MailDataCreator {
     }
 
     mailItemToReply.bodyHtml = config.Body ?? "";
-    mailItemToReply.quoteType = config.QuoteType
+    mailItemToReply.quoteType = config.QuoteType;
     return mailItemToReply;
   }
 }

@@ -50,7 +50,7 @@ export class ConfigLoader {
   static async loadConfigForCurrentLanguageAndButtonId(culture, id) {
     const configForLang = await ConfigLoader.loadConfigForCurrentLanguage(culture);
     if (configForLang && configForLang.ButtonConfigList) {
-      return configForLang.ButtonConfigList.find(conf => conf.Id === id);
+      return configForLang.ButtonConfigList.find((conf) => conf.Id === id);
     }
     return null;
   }

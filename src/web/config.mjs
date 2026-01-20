@@ -6,6 +6,19 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Copyright (c) 2025 ClearCode Inc.
 */
 
+function getEnumValueByKey(enumObj, key) {
+  if (!key) {
+    return undefined;
+  }
+  const lowerdKey = key.toLowerCase();
+  for (const enumKey in enumObj) {
+    if (enumKey.toLowerCase() === lowerdKey) {
+      return enumObj[enumKey];
+    }
+  }
+  return undefined;
+}
+
 export class ButtonConfigEnums {
   static ForwardType = {
     Unknown: 0,
@@ -41,7 +54,6 @@ export class ButtonConfig {
   LoweredAllowedDomains;
   AllowedDomainsType;
   ForwardType;
-  Image;
 
   constructor({
     Id,
@@ -53,7 +65,6 @@ export class ButtonConfig {
     QuoteType,
     AllowedDomains,
     ForwardType,
-    Image,
   }) {
     this.Id = Id ?? "";
     this.Label = Label ?? "";
@@ -63,8 +74,9 @@ export class ButtonConfig {
     this.Recipients = Recipients ?? [];
     this.QuoteType = QuoteType ?? false;
     this.AllowedDomains = AllowedDomains ?? [];
-    this.ForwardType = ForwardType ?? ButtonConfigEnums.ForwardType.Unknown;
-    this.Image = Image ?? "logo.png";
+    this.ForwardType =
+      getEnumValueByKey(ButtonConfigEnums.ForwardType, ForwardType) ??
+      ButtonConfigEnums.ForwardType.Unknown;
 
     if (!Recipients || Recipients.length == 0) {
       this.RecipientsType = ButtonConfigEnums.RecipientsType.Blank;
@@ -93,11 +105,7 @@ export class Config {
   GroupLabel;
   ButtonConfigList;
 
-  constructor({
-    Culture,
-    GroupLabel,
-    ButtonConfigList,
-  }) {
+  constructor({ Culture, GroupLabel, ButtonConfigList }) {
     this.Culture = Culture ?? "en-US";
     this.GroupLabel = GroupLabel ?? "Typical Reply";
     this.ButtonConfigList = [];
