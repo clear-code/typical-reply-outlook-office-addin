@@ -6,7 +6,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Copyright (c) 2026 ClearCode Inc.
 */
 import { ConfigLoader } from "./config-loader.mjs";
-import { MailDataCreator } from "./mail-data-creator.mjs";
+import { ReplayMailDataCreator } from "./mail-data-creator.mjs";
 import { OfficeDataAccessHelper } from "./office-data-access-helper.mjs";
 
 Office.onReady(() => {});
@@ -16,28 +16,24 @@ async function onTypicalReplyButtonClicked(event) {
   console.debug("actionId: " + actionId);
   console.debug("conversationId: " + Office.context.mailbox.item.conversationId);
   const originalMailData = {
-    toRecipients: Office.context.mailbox.item.to,
-    ccRecipients: Office.context.mailbox.item.cc,
-    bccRecipients: Office.context.mailbox.item.bcc,
-    sender: Office.context.mailbox.item.sender,
+    toRecipients: Office.context.mailbox.item.to.map((recipients) => recipients.emailAddress),
+    ccRecipients: Office.context.mailbox.item.cc.map((recipients) => recipients.emailAddress),
+    bccRecipients: Office.context.mailbox.item.bcc.map((recipients) => recipients.emailAddress),
+    sender: Office.context.mailbox.item.sender?.emailAddress,
     subject: Office.context.mailbox.item.subject,
     id: Office.context.mailbox.item.itemId,
   };
   try {
-    const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(
+    const buttonConfig = await ConfigLoader.loadButtonConfig(
       Office.context.displayLanguage,
       actionId
     );
     if (!buttonConfig) {
-      console.log("no button config find.");
+      console.log("No button config find.");
       return event.completed();
     }
-    const replyMailData = MailDataCreator.CreateDataOnForReplyForm({
-      config: buttonConfig,
-      originalMailData,
-    });
-    if (!replyMailData) {
-      console.log("failed to create reply mail data.");
+    if (!ReplayMailDataCreator.isAllRecipientsAllowed({ buttonConfig, originalMailData })) {
+      console.log("Recipients contains some prohibited domains");
       return event.completed();
     }
     Office.context.roamingSettings.set(
@@ -46,14 +42,21 @@ async function onTypicalReplyButtonClicked(event) {
     );
     Office.context.roamingSettings.set("actionId", actionId);
     await OfficeDataAccessHelper.saveRoamingSettingsAsync();
-    replyMailData.executeMethod({
-      attachments: replyMailData.attachments,
-      callback: () => {
-        event.completed();
+    const attachments = ReplayMailDataCreator.getAttachments({ buttonConfig, originalMailData });
+    const replyFormFunction = ReplayMailDataCreator.getReplyFormFunction(buttonConfig);
+    replyFormFunction(
+      {
+        attachments,
       },
-    });
+      (asyncResult) => {
+        if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+          console.error(`replyFormFunction failed with message ${asyncResult.error.message}`);
+        }
+        event.completed();
+      }
+    );
   } catch (e) {
-    console.log("createNewMail Failed:", e);
+    console.error("onTypicalReplyButtonClicked Failed:", e);
     event.completed();
   }
 }
@@ -68,7 +71,7 @@ async function onNewMessageComposeCreated(event) {
   if (conversationId !== targetConversationId) {
     return event.completed();
   }
-  const buttonConfig = await ConfigLoader.loadConfigForCurrentLanguageAndButtonId(
+  const buttonConfig = await ConfigLoader.loadButtonConfig(
     Office.context.displayLanguage,
     actionId
   );
@@ -76,20 +79,26 @@ async function onNewMessageComposeCreated(event) {
   Office.context.roamingSettings.remove("actionId");
   await OfficeDataAccessHelper.saveRoamingSettingsAsync();
 
-  const currentSubject = await OfficeDataAccessHelper.getSubjectAsync();
-  const data = MailDataCreator.CreateReplyMailData({ config: buttonConfig, currentSubject });
-  if (data.newToRecipients) {
-    await OfficeDataAccessHelper.setToAsync(data.newToRecipients);
+  const originalSubject = await OfficeDataAccessHelper.getSubjectAsync();
+  const newSubject = await ReplayMailDataCreator.createSubject({ buttonConfig, originalSubject });
+  await OfficeDataAccessHelper.setSubjectAsync(newSubject);
+  const recipients = ReplayMailDataCreator.getNewRecipients(buttonConfig);
+  console.log(recipients);
+  if (recipients.to) {
+    await OfficeDataAccessHelper.setToAsync(recipients.to);
   }
-  await OfficeDataAccessHelper.setSubjectAsync(data.subject);
-  let body = "";
-  if (data.quoteType) {
-    body = await OfficeDataAccessHelper.getBodyAsync();
+  if (recipients.cc) {
+    await OfficeDataAccessHelper.setCcAsync(recipients.cc);
   }
-  if (data.bodyHtml) {
-    body = data.bodyHtml + "\n\n" + body;
+  if (recipients.bcc) {
+    await OfficeDataAccessHelper.setBccAsync(recipients.bcc);
   }
-  await OfficeDataAccessHelper.setBodyAsync(body);
+  if (!buttonConfig.QuoteType) {
+    await OfficeDataAccessHelper.setBodyAsync("");
+  }
+  if (buttonConfig.Body) {
+    await OfficeDataAccessHelper.prependBodyAsync(`${buttonConfig.Body} \n`);
+  }
   event.completed();
 }
 window.onNewMessageComposeCreated = onNewMessageComposeCreated;

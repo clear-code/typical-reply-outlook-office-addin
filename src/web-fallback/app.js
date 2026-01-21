@@ -11,4 +11,9 @@ async function onTypicalReplyButtonClicked(event) {
   event.completed();
 }
 window.onTypicalReplyButtonClicked = onTypicalReplyButtonClicked;
+async function onNewMessageComposeCreated(event) {
+  event.completed();
+}
+window.onNewMessageComposeCreated = onNewMessageComposeCreated;
 Office.actions.associate("onTypicalReplyButtonClicked", onTypicalReplyButtonClicked);
+Office.actions.associate("onNewMessageComposeCreated", onNewMessageComposeCreated);

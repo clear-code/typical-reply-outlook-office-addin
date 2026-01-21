@@ -8,86 +8,111 @@ Copyright (c) 2025 ClearCode Inc.
 import { ButtonConfigEnums } from "./config.mjs";
 import * as RecipientParser from "./recipient-parser.mjs";
 
-export class MailDataCreator {
-  static CreateDataOnForReplyForm({ config, originalMailData }) {
-    const mailItemToReply = {};
-    switch (config.RecipientsType) {
+export class ReplayMailDataCreator {
+  static getReplyFormFunction(buttonConfig) {
+    switch (buttonConfig.RecipientsType) {
       case ButtonConfigEnums.RecipientsType.All:
-        mailItemToReply.executeMethod = Office.context.mailbox.item.displayReplyAllFormAsync;
-        mailItemToReply.toRecipients = originalMailData.toRecipients;
-        mailItemToReply.ccRecipients = originalMailData.ccRecipients;
-        mailItemToReply.bccRecipients = originalMailData.bccRecipients;
+        return Office.context.mailbox.item.displayReplyAllFormAsync;
+      case ButtonConfigEnums.RecipientsType.Sender:
+        return Office.context.mailbox.item.displayReplyFormAsync;
+      case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
+        return Office.context.mailbox.item.displayReplyFormAsync;
+      default:
+        return Office.context.mailbox.item.displayReplyFormAsync;
+    }
+  }
+
+  static isAllRecipientsAllowed({ buttonConfig, originalMailData }) {
+    let recipients;
+    switch (buttonConfig.RecipientsType) {
+      case ButtonConfigEnums.RecipientsType.All:
+        recipients = [
+          ...(originalMailData.toRecipients ?? []),
+          ...(originalMailData.ccRecipients ?? []),
+          ...(originalMailData.bccRecipients ?? []),
+          originalMailData.sender
+        ];
         break;
       case ButtonConfigEnums.RecipientsType.Sender:
-        mailItemToReply.executeMethod = Office.context.mailbox.item.displayReplyFormAsync;
-        mailItemToReply.toRecipients = originalMailData.sender;
+        if (originalMailData.sender) {
+          recipients = [originalMailData.sender];
+        }
         break;
       case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
-        mailItemToReply.executeMethod = Office.context.mailbox.item.displayReplyFormAsync;
-        mailItemToReply.toRecipients = config.Recipients;
+        recipients = buttonConfig.Recipients ?? [];
         break;
       default:
         break;
     }
-    if (config.AllowedDomainsType == ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser) {
-      const loweredAllowedDomains = config.AllowedDomains.toLowerCase();
-      for (const recipient of [
-        ...(mailItemToReply.toRecipients ?? []),
-        ...(mailItemToReply.ccRecipients ?? []),
-        ...(mailItemToReply.toRecipients ?? []),
-      ]) {
+    if (buttonConfig.AllowedDomainsType == ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser) {
+      const loweredAllowedDomains = buttonConfig.AllowedDomains.map((domain) =>
+        domain.toLowerCase()
+      );
+      for (const recipient of recipients) {
+        if (!recipient) {
+          continue;
+        }
         const parsedRecipient = RecipientParser.parse(recipient);
-        if (loweredAllowedDomains.Any((_) => _ == parsedRecipient.domain)) {
+        if (loweredAllowedDomains.find((domain) => domain === parsedRecipient.domain)) {
           continue;
         }
         console.log(`Prohibited domain: ${parsedRecipient.domain}`);
-        return null;
+        return false;
       }
     }
-    switch (config.ForwardType) {
-      case ButtonConfigEnums.ForwardType.Attachment:
-        mailItemToReply.attachments = [
-          {
-            name: originalMailData.subject,
-            type: Office.MailboxEnums.AttachmentType.Item,
-            itemId: originalMailData.id,
-          },
-        ];
-        break;
-      case ButtonConfigEnums.ForwardType.Inline:
-        mailItemToReply.attachments = [
-          {
-            name: originalMailData.subject,
-            type: Office.MailboxEnums.AttachmentType.Item,
-            itemId: originalMailData.id,
-          },
-        ];
-        break;
-    }
-    return mailItemToReply;
+    return true;
   }
-  static CreateReplyMailData({ config, originalSuject }) {
-    const mailItemToReply = {};
-    switch (config.RecipientsType) {
+
+  static getAttachments({ buttonConfig, originalMailData }) {
+    if (!originalMailData.id) {
+      return [];
+    }
+    switch (buttonConfig.ForwardType) {
+      case ButtonConfigEnums.ForwardType.Attachment:
+        return [
+          {
+            name: originalMailData.subject ?? " ",
+            type: Office.MailboxEnums.AttachmentType.Item,
+            itemId: originalMailData.id,
+          },
+        ];
+      case ButtonConfigEnums.ForwardType.Inline:
+        // TODO: Suport Inline mode
+        return [
+          {
+            name: originalMailData.subject ?? " ",
+            type: Office.MailboxEnums.AttachmentType.Item,
+            itemId: originalMailData.id,
+          },
+        ];
+    }
+    return [];
+  }
+
+  static getNewRecipients(buttonConfig) {
+    console.log(buttonConfig.RecipientsType);
+    switch (buttonConfig.RecipientsType) {
       case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
-        mailItemToReply.newToRecipients = config.Recipients;
-        break;
+        return {
+          to: buttonConfig.Recipients,
+          cc: [],
+          bcc: [],
+        };
       default:
-        break;
+        return {};
     }
+  }
 
-    if (config.Subject) {
-      mailItemToReply.subject = config.Subject;
+  static createSubject({ buttonConfig, originalSuject }) {
+    let newSubject = "";
+    if (buttonConfig.Subject) {
+      newSubject = buttonConfig.Subject;
     } else {
-      mailItemToReply.subject = originalSuject;
+      newSubject = originalSuject;
     }
-
-    if (config.SubjectPrefix) {
-      mailItemToReply.subject = `${config.SubjectPrefix} ${mailItemToReply.subject ?? ""}`;
+    if (buttonConfig.SubjectPrefix) {
+      newSubject = `${buttonConfig.SubjectPrefix} ${newSubject ?? ""}`;
     }
-
-    mailItemToReply.bodyHtml = config.Body ?? "";
-    mailItemToReply.quoteType = config.QuoteType;
-    return mailItemToReply;
+    return newSubject;
   }
 }

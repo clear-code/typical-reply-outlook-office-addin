@@ -81,15 +81,8 @@ export class ButtonConfig {
     if (!Recipients || Recipients.length == 0) {
       this.RecipientsType = ButtonConfigEnums.RecipientsType.Blank;
     } else {
-      this.RecipientsType = ButtonConfigEnums.RecipientsType.SpecifiedByUser;
-      for (const key of Object.keys(ButtonConfigEnums.RecipientsType)) {
-        const lowerdKey = key.toLowerCase();
-        const inputRecipientLower = Recipients[0].toLowerCase();
-        if (lowerdKey === inputRecipientLower) {
-          this.RecipientsType = ButtonConfigEnums.RecipientsType[key];
-          break;
-        }
-      }
+      this.RecipientsType = getEnumValueByKey(ButtonConfigEnums.RecipientsType, Recipients[0].toLowerCase()) 
+        ?? ButtonConfigEnums.RecipientsType.SpecifiedByUser;
     }
 
     if (!AllowedDomains || AllowedDomains.length == 0 || AllowedDomains[0] === "*") {
