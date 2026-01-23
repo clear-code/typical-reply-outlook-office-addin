@@ -42,18 +42,17 @@ export class ButtonConfigEnums {
 }
 
 export class ButtonConfig {
-  Id;
-  Label;
-  SubjectPrefix;
-  Subject;
-  Body;
-  Recipients;
-  RecipientsType;
-  QuoteType;
-  AllowedDomains;
-  LoweredAllowedDomains;
-  AllowedDomainsType;
-  ForwardType;
+  id;
+  label;
+  subjectPrefix;
+  subject;
+  body;
+  recipients;
+  recipientsType;
+  quoteType;
+  allowedDomains;
+  allowedDomainsType;
+  forwardType;
 
   constructor({
     Id,
@@ -66,59 +65,59 @@ export class ButtonConfig {
     AllowedDomains,
     ForwardType,
   }) {
-    this.Id = Id ?? "";
-    this.Label = Label ?? "";
-    this.SubjectPrefix = SubjectPrefix ?? "";
-    this.Subject = Subject ?? "";
-    this.Body = Body ?? "";
-    this.Recipients = Recipients ?? [];
-    this.QuoteType = QuoteType ?? false;
-    this.AllowedDomains = AllowedDomains ?? [];
-    this.ForwardType =
+    this.id = Id ?? "";
+    this.label = Label ?? "";
+    this.subjectPrefix = SubjectPrefix ?? "";
+    this.subject = Subject ?? "";
+    this.body = Body ?? "";
+    this.recipients = Recipients ?? [];
+    this.quoteType = QuoteType ?? false;
+    this.allowedDomains = AllowedDomains ?? [];
+    this.forwardType =
       getEnumValueByKey(ButtonConfigEnums.ForwardType, ForwardType) ??
       ButtonConfigEnums.ForwardType.Unknown;
 
     if (!Recipients || Recipients.length == 0) {
-      this.RecipientsType = ButtonConfigEnums.RecipientsType.Blank;
+      this.recipientsType = ButtonConfigEnums.RecipientsType.Blank;
     } else {
-      this.RecipientsType = getEnumValueByKey(ButtonConfigEnums.RecipientsType, Recipients[0].toLowerCase()) 
+      this.recipientsType = getEnumValueByKey(ButtonConfigEnums.RecipientsType, Recipients[0].toLowerCase()) 
         ?? ButtonConfigEnums.RecipientsType.SpecifiedByUser;
     }
 
     if (!AllowedDomains || AllowedDomains.length == 0 || AllowedDomains[0] === "*") {
-      this.AllowedDomainsType = ButtonConfigEnums.AllowedDomainsType.Blank;
+      this.allowedDomainsType = ButtonConfigEnums.AllowedDomainsType.Blank;
     } else {
-      this.AllowedDomainsType = ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser;
+      this.allowedDomainsType = ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser;
     }
   }
 }
 
 export class Config {
-  Culture;
-  GroupLabel;
-  ButtonConfigList;
+  culture;
+  groupLabel;
+  buttonConfigList;
 
   constructor({ Culture, GroupLabel, ButtonConfigList }) {
-    this.Culture = Culture ?? "en-US";
-    this.GroupLabel = GroupLabel ?? "Typical Reply";
-    this.ButtonConfigList = [];
+    this.culture = Culture ?? "en-US";
+    this.groupLabel = GroupLabel ?? "Typical Reply";
+    this.buttonConfigList = [];
     if (ButtonConfigList) {
       for (const buttonConfig of ButtonConfigList) {
-        this.ButtonConfigList.push(new ButtonConfig(buttonConfig));
+        this.buttonConfigList.push(new ButtonConfig(buttonConfig));
       }
     }
   }
 }
 
 export class TypicalReplyConfig {
-  Priority;
-  ConfigList;
+  priority;
+  configList;
   constructor({ Priority, ConfigList }) {
-    this.Priority = Priority ?? 0;
-    this.ConfigList = [];
+    this.priority = Priority ?? 0;
+    this.configList = [];
     if (ConfigList) {
       for (const config of ConfigList) {
-        this.ConfigList.push(new Config(config));
+        this.configList.push(new Config(config));
       }
     }
   }

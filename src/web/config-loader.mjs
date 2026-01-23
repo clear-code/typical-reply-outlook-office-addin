@@ -36,21 +36,21 @@ export class ConfigLoader {
 
   static async loadConfigForCurrentLanguage(culture) {
     const typicalReplyConfig = await ConfigLoader.loadFileConfig();
-    let config = typicalReplyConfig?.ConfigList?.find((_) => (_.Culture ?? null) === culture);
+    let config = typicalReplyConfig?.configList?.find((_) => (_.culture ?? null) === culture);
     if (!config) {
       const lang = culture.split("-")[0];
-      config = typicalReplyConfig?.ConfigList?.find((_) => (_.Culture ?? null) === lang);
+      config = typicalReplyConfig?.configList?.find((_) => (_.culture ?? null) === lang);
     }
     if (!config) {
-      config = typicalReplyConfig?.ConfigList?.[0];
+      config = typicalReplyConfig?.configList?.[0];
     }
     return config;
   }
 
   static async loadButtonConfig(culture, id) {
     const configForLang = await ConfigLoader.loadConfigForCurrentLanguage(culture);
-    if (configForLang && configForLang.ButtonConfigList) {
-      return configForLang.ButtonConfigList.find((conf) => conf.Id === id);
+    if (configForLang && configForLang.buttonConfigList) {
+      return configForLang.buttonConfigList.find((conf) => conf.id === id);
     }
     return null;
   }

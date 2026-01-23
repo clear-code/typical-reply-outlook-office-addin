@@ -10,7 +10,7 @@ import * as RecipientParser from "./recipient-parser.mjs";
 
 export class ReplayMailDataCreator {
   static getReplyFormFunction(buttonConfig) {
-    switch (buttonConfig.RecipientsType) {
+    switch (buttonConfig.recipientsType) {
       case ButtonConfigEnums.RecipientsType.All:
         return Office.context.mailbox.item.displayReplyAllFormAsync;
       case ButtonConfigEnums.RecipientsType.Sender:
@@ -22,9 +22,10 @@ export class ReplayMailDataCreator {
     }
   }
 
+
   static isAllRecipientsAllowed({ buttonConfig, originalMailData }) {
     let recipients;
-    switch (buttonConfig.RecipientsType) {
+    switch (buttonConfig.recipientsType) {
       case ButtonConfigEnums.RecipientsType.All:
         recipients = [
           ...(originalMailData.toRecipients ?? []),
@@ -39,13 +40,13 @@ export class ReplayMailDataCreator {
         }
         break;
       case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
-        recipients = buttonConfig.Recipients ?? [];
+        recipients = buttonConfig.recipients ?? [];
         break;
       default:
         break;
     }
-    if (buttonConfig.AllowedDomainsType == ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser) {
-      const loweredAllowedDomains = buttonConfig.AllowedDomains.map((domain) =>
+    if (buttonConfig.allowedDomainsType == ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser) {
+      const loweredAllowedDomains = buttonConfig.allowedDomains.map((domain) =>
         domain.toLowerCase()
       );
       for (const recipient of recipients) {
@@ -67,7 +68,7 @@ export class ReplayMailDataCreator {
     if (!originalMailData.id) {
       return [];
     }
-    switch (buttonConfig.ForwardType) {
+    switch (buttonConfig.forwardType) {
       case ButtonConfigEnums.ForwardType.Attachment:
         return [
           {
@@ -90,11 +91,11 @@ export class ReplayMailDataCreator {
   }
 
   static getNewRecipients(buttonConfig) {
-    console.log(buttonConfig.RecipientsType);
-    switch (buttonConfig.RecipientsType) {
+    console.log(buttonConfig.recipientsType);
+    switch (buttonConfig.recipientsType) {
       case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
         return {
-          to: buttonConfig.Recipients,
+          to: buttonConfig.recipients,
           cc: [],
           bcc: [],
         };
@@ -103,15 +104,15 @@ export class ReplayMailDataCreator {
     }
   }
 
-  static createSubject({ buttonConfig, originalSuject }) {
+  static createSubject({ buttonConfig, originalSubject }) {
     let newSubject = "";
-    if (buttonConfig.Subject) {
-      newSubject = buttonConfig.Subject;
+    if (buttonConfig.subject) {
+      newSubject = buttonConfig.subject;
     } else {
-      newSubject = originalSuject;
+      newSubject = originalSubject;
     }
-    if (buttonConfig.SubjectPrefix) {
-      newSubject = `${buttonConfig.SubjectPrefix} ${newSubject ?? ""}`;
+    if (buttonConfig.subjectPrefix) {
+      newSubject = `${buttonConfig.subjectPrefix} ${newSubject ?? ""}`;
     }
     return newSubject;
   }

@@ -83,7 +83,6 @@ async function onNewMessageComposeCreated(event) {
   const newSubject = await ReplayMailDataCreator.createSubject({ buttonConfig, originalSubject });
   await OfficeDataAccessHelper.setSubjectAsync(newSubject);
   const recipients = ReplayMailDataCreator.getNewRecipients(buttonConfig);
-  console.log(recipients);
   if (recipients.to) {
     await OfficeDataAccessHelper.setToAsync(recipients.to);
   }
@@ -93,11 +92,11 @@ async function onNewMessageComposeCreated(event) {
   if (recipients.bcc) {
     await OfficeDataAccessHelper.setBccAsync(recipients.bcc);
   }
-  if (!buttonConfig.QuoteType) {
+  if (!buttonConfig.quoteType) {
     await OfficeDataAccessHelper.setBodyAsync("");
   }
-  if (buttonConfig.Body) {
-    await OfficeDataAccessHelper.prependBodyAsync(`${buttonConfig.Body} \n`);
+  if (buttonConfig.body) {
+    await OfficeDataAccessHelper.prependBodyAsync(`${buttonConfig.body} \n`);
   }
   event.completed();
 }
