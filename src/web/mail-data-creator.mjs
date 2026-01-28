@@ -22,7 +22,6 @@ export class ReplayMailDataCreator {
     }
   }
 
-
   static isAllRecipientsAllowed({ buttonConfig, originalMailData }) {
     let recipients;
     switch (buttonConfig.recipientsType) {
@@ -31,7 +30,7 @@ export class ReplayMailDataCreator {
           ...(originalMailData.toRecipients ?? []),
           ...(originalMailData.ccRecipients ?? []),
           ...(originalMailData.bccRecipients ?? []),
-          originalMailData.sender
+          originalMailData.sender,
         ];
         break;
       case ButtonConfigEnums.RecipientsType.Sender:

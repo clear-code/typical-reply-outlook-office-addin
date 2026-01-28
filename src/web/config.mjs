@@ -80,12 +80,13 @@ export class ButtonConfig {
     if (!Recipients || Recipients.length == 0) {
       this.recipientsType = ButtonConfigEnums.RecipientsType.Blank;
     } else {
-      this.recipientsType = getEnumValueByKey(ButtonConfigEnums.RecipientsType, Recipients[0].toLowerCase()) 
-        ?? ButtonConfigEnums.RecipientsType.SpecifiedByUser;
+      this.recipientsType =
+        getEnumValueByKey(ButtonConfigEnums.RecipientsType, Recipients[0].toLowerCase()) ??
+        ButtonConfigEnums.RecipientsType.SpecifiedByUser;
     }
 
     if (!AllowedDomains || AllowedDomains.length == 0 || AllowedDomains[0] === "*") {
-      this.allowedDomainsType = ButtonConfigEnums.AllowedDomainsType.Blank;
+      this.allowedDomainsType = ButtonConfigEnums.AllowedDomainsType.All;
     } else {
       this.allowedDomainsType = ButtonConfigEnums.AllowedDomainsType.SpecifiedByUser;
     }
