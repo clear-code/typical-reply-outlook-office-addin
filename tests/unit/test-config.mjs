@@ -14,21 +14,17 @@ test_TypicalReplyConfig_constructor.parameters = {
     argument: {
     },
     expected: {
-      priority: 0,
       configList: []
     },
   },
   "full": {
     argument: {
-      "Priority": 1,
       "ConfigList": [
         {
           "Culture": "ja-JP",
-          "GroupLabel": "定型返信",
           "ButtonConfigList": [
             {
               "Id": "button1",
-              "Label": "いいね！",
               "Subject": "件名",
               "SubjectPrefix": "[[いいね！]]",
               "Body": "いいね！",
@@ -46,15 +42,12 @@ test_TypicalReplyConfig_constructor.parameters = {
       ]
     },
     expected: {
-      priority: 1,
       configList: [
         {
           culture: "ja-JP",
-          groupLabel: "定型返信",
           buttonConfigList: [
             {
               id: "button1",
-              label: "いいね！",
               subjectPrefix: "[[いいね！]]",
               subject: "件名",
               body: "いいね！",
@@ -87,7 +80,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -102,7 +94,6 @@ test_ButtonConfig_constructor.parameters = {
   "full": {
     argument: {
       "Id": "button1",
-      "Label": "いいね！",
       "Subject": "件名",
       "SubjectPrefix": "[[いいね！]]",
       "Body": "いいね！",
@@ -117,7 +108,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "button1",
-      label: "いいね！",
       subjectPrefix: "[[いいね！]]",
       subject: "件名",
       body: "いいね！",
@@ -137,7 +127,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -155,7 +144,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -173,7 +161,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -191,7 +178,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -209,7 +195,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -227,7 +212,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",
@@ -245,7 +229,6 @@ test_ButtonConfig_constructor.parameters = {
     },
     expected: {
       id: "",
-      label: "",
       subjectPrefix: "",
       subject: "",
       body: "",

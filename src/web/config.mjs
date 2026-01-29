@@ -43,7 +43,6 @@ export class ButtonConfigEnums {
 
 export class ButtonConfig {
   id;
-  label;
   subjectPrefix;
   subject;
   body;
@@ -56,7 +55,6 @@ export class ButtonConfig {
 
   constructor({
     Id,
-    Label,
     SubjectPrefix,
     Subject,
     Body,
@@ -66,7 +64,6 @@ export class ButtonConfig {
     ForwardType,
   }) {
     this.id = Id ?? "";
-    this.label = Label ?? "";
     this.subjectPrefix = SubjectPrefix ?? "";
     this.subject = Subject ?? "";
     this.body = Body ?? "";
@@ -95,12 +92,10 @@ export class ButtonConfig {
 
 export class Config {
   culture;
-  groupLabel;
   buttonConfigList;
 
-  constructor({ Culture, GroupLabel, ButtonConfigList }) {
+  constructor({ Culture, ButtonConfigList }) {
     this.culture = Culture ?? "en-US";
-    this.groupLabel = GroupLabel ?? "Typical Reply";
     this.buttonConfigList = [];
     if (ButtonConfigList) {
       for (const buttonConfig of ButtonConfigList) {
@@ -111,10 +106,10 @@ export class Config {
 }
 
 export class TypicalReplyConfig {
-  priority;
   configList;
-  constructor({ Priority, ConfigList }) {
-    this.priority = Priority ?? 0;
+  constructor({ ConfigList }) {
+    // VSTO version TypicalReplyConfig has a Priority property
+    // but it's not used in this add-in version.
     this.configList = [];
     if (ConfigList) {
       for (const config of ConfigList) {
