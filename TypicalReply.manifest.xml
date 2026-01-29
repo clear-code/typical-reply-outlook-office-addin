@@ -70,32 +70,10 @@
                 <Group id="msgReadCmdGroup">
                   <Label resid="CommandsGroup.Label"/>
                   <Control xsi:type="Button" id="msgReadTypicalReply">
-                    <Label resid="SettingButton.Label"/>
+                    <Label resid="TypicalReplyButton.Label"/>
                     <Supertip>
-                      <Title resid="SettingButton.SupertipTitle"/>
-                      <Description resid="SettingButton.SupertipText"/>
-                    </Supertip>
-                    <Icon>
-                      <bt:Image size="16" resid="Icon.16x16"/>
-                      <bt:Image size="32" resid="Icon.32x32"/>
-                      <bt:Image size="80" resid="Icon.80x80"/>
-                    </Icon>
-                    <Action xsi:type="ExecuteFunction">
-                      <FunctionName>onTypicalReplyButtonClicked</FunctionName>
-                    </Action>
-                  </Control>
-                </Group>
-              </OfficeTab>
-            </ExtensionPoint>
-            <ExtensionPoint xsi:type="AppointmentOrganizerCommandSurface">
-              <OfficeTab id="appointmentReadTabDefault">
-                <Group id="appointmentReadCmdGroup">
-                  <Label resid="CommandsGroup.Label"/>
-                  <Control xsi:type="Button" id="appointmentReadTypicalReply">
-                    <Label resid="SettingButton.Label"/>
-                    <Supertip>
-                      <Title resid="SettingButton.SupertipTitle"/>
-                      <Description resid="SettingButton.SupertipText"/>
+                      <Title resid="TypicalReplyButton.SupertipTitle"/>
+                      <Description resid="TypicalReplyButton.SupertipText"/>
                     </Supertip>
                     <Icon>
                       <bt:Image size="16" resid="Icon.16x16"/>
@@ -125,19 +103,19 @@
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="CommandsGroup.Label" DefaultValue="SPAM Report"/>
-          <bt:String id="SettingButton.Label" DefaultValue="Send Report">
+          <bt:String id="TypicalReplyButton.Label" DefaultValue="Send Report">
             <bt:Override Locale="en-US" Value="Send Report"/>
             <bt:Override Locale="ja-JP" Value="Send Report"/>
             <bt:Override Locale="zh-CN" Value="发送报告"/>
           </bt:String>
-          <bt:String id="SettingButton.SupertipTitle" DefaultValue="Send Report">
+          <bt:String id="TypicalReplyButton.SupertipTitle" DefaultValue="Send Report">
             <bt:Override Locale="en-US" Value="Send Report"/>
             <bt:Override Locale="ja-JP" Value="Send Report"/>
             <bt:Override Locale="zh-CN" Value="T发送报告"/>
           </bt:String>
         </bt:ShortStrings>
         <bt:LongStrings>
-          <bt:String id="SettingButton.SupertipText" DefaultValue="Send Report as suspicious email">
+          <bt:String id="TypicalReplyButton.SupertipText" DefaultValue="Send Report as suspicious email">
             <bt:Override Locale="en-US" Value="Send Report as suspicious email"/>
             <bt:Override Locale="ja-JP" Value="不審メール報告"/>
             <bt:Override Locale="zh-CN" Value="可疑邮件报告"/>
