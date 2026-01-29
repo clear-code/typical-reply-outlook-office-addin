@@ -76,8 +76,8 @@ test_TypicalReplyConfig_constructor.parameters = {
 export function test_TypicalReplyConfig_constructor({ argument, expected }) {
   const typicalReplyConfig = new TypicalReplyConfig(argument);
   is(
-    typicalReplyConfig,
-    expected
+    expected,
+    typicalReplyConfig
   );
 }
 
@@ -261,7 +261,7 @@ test_ButtonConfig_constructor.parameters = {
 export function test_ButtonConfig_constructor({ argument, expected }) {
   const buttonConfig = new ButtonConfig(argument);
   is(
-    buttonConfig,
-    expected
+    expected,
+    buttonConfig
   );
 }
