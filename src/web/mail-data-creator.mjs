@@ -90,11 +90,16 @@ export class ReplayMailDataCreator {
   }
 
   static getNewRecipients(buttonConfig) {
-    console.log(buttonConfig.recipientsType);
     switch (buttonConfig.recipientsType) {
       case ButtonConfigEnums.RecipientsType.SpecifiedByUser:
         return {
           to: buttonConfig.recipients,
+          cc: [],
+          bcc: [],
+        };
+      case ButtonConfigEnums.RecipientsType.Blank:
+        return {
+          to: [],
           cc: [],
           bcc: [],
         };
@@ -104,15 +109,11 @@ export class ReplayMailDataCreator {
   }
 
   static createSubject({ buttonConfig, originalSubject }) {
-    let newSubject = "";
-    if (buttonConfig.subject) {
-      newSubject = buttonConfig.subject;
-    } else {
-      newSubject = originalSubject;
-    }
-    if (buttonConfig.subjectPrefix) {
-      newSubject = `${buttonConfig.subjectPrefix} ${newSubject ?? ""}`;
-    }
-    return newSubject;
+    let prefix = buttonConfig.subjectPrefix ?
+     `${buttonConfig.subjectPrefix} ` :
+     "";
+    return buttonConfig.subject ? 
+      prefix + buttonConfig.subject:
+      prefix + originalSubject;
   }
 }
