@@ -40,7 +40,7 @@ async function onTypicalReplyButtonClicked(event) {
       "conversationId",
       Office.context.mailbox.item.conversationId ?? ""
     );
-    Office.context.roamingSettings.set("actionId", actionId);
+    Office.context.roamingSettings.set("buttonconfig", JSON.stringify(buttonConfig));
     await OfficeDataAccessHelper.saveRoamingSettingsAsync();
     const attachments = ReplayMailDataCreator.getAttachments({ buttonConfig, originalMailData });
     const replyFormFunction = ReplayMailDataCreator.getReplyFormFunction(buttonConfig);
@@ -64,23 +64,22 @@ window.onTypicalReplyButtonClicked = onTypicalReplyButtonClicked;
 
 async function onNewMessageComposeCreated(event) {
   const conversationId = Office.context.mailbox.item.conversationId;
-  const actionId = Office.context.roamingSettings.get("actionId")?.trim() ?? "";
+  const buttonConfigString = Office.context.roamingSettings.get("buttonconfig")?.trim() ?? "";
+  if (!buttonConfigString) {
+    return event.completed();
+  }
   const targetConversationId = Office.context.roamingSettings.get("conversationId")?.trim() ?? "";
-  console.debug("action id: " + actionId);
-  console.debug("targetConversation id: " + targetConversationId);
+  const buttonConfig = JSON.parse(buttonConfigString);
   if (conversationId !== targetConversationId) {
     return event.completed();
   }
-  const buttonConfig = await ConfigLoader.loadButtonConfig(
-    Office.context.displayLanguage,
-    actionId
-  );
+  console.debug("conversation id matched.");
   Office.context.roamingSettings.remove("conversationId");
-  Office.context.roamingSettings.remove("actionId");
+  Office.context.roamingSettings.remove("buttonconfig");
   await OfficeDataAccessHelper.saveRoamingSettingsAsync();
 
   const originalSubject = await OfficeDataAccessHelper.getSubjectAsync();
-  const newSubject = await ReplayMailDataCreator.createSubject({ buttonConfig, originalSubject });
+  const newSubject = ReplayMailDataCreator.createSubject({ buttonConfig, originalSubject });
   await OfficeDataAccessHelper.setSubjectAsync(newSubject);
   const recipients = ReplayMailDataCreator.getNewRecipients(buttonConfig);
   if (recipients.to) {
