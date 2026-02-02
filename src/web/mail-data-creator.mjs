@@ -109,11 +109,7 @@ export class ReplayMailDataCreator {
   }
 
   static createSubject({ buttonConfig, originalSubject }) {
-    let prefix = buttonConfig.subjectPrefix ?
-     `${buttonConfig.subjectPrefix} ` :
-     "";
-    return buttonConfig.subject ? 
-      prefix + buttonConfig.subject:
-      prefix + originalSubject;
+    const prefix = buttonConfig.subjectPrefix ? `${buttonConfig.subjectPrefix} ` : "";
+    return buttonConfig.subject ? prefix + buttonConfig.subject : prefix + originalSubject;
   }
 }
