@@ -28,15 +28,16 @@
     </Sets>
   </Requirements>
   <FormSettings>
-    <Form xsi:type="ItemEdit">
+    <Form xsi:type="ItemRead">
       <DesktopSettings>
         <SourceLocation DefaultValue="https://127.0.0.1:10042/app.html" />
+        <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
   </FormSettings>
   <Permissions>ReadWriteMailbox</Permissions>
   <Rule xsi:type="RuleCollection" Mode="Or">
-    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit" />
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
   </Rule>
 
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
@@ -66,7 +67,7 @@
               <SourceLocation resid="residUILessFunctionFileUrl"/>
             </ExtensionPoint>
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
-              <OfficeTab id="msgReadTabDefault">
+              <OfficeTab id="TabDefault">
                 <Group id="msgReadCmdGroup">
                   <Label resid="CommandsGroup.Label"/>
                   <Control xsi:type="Button" id="msgReadTypicalReply">
