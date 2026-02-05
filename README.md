@@ -19,12 +19,16 @@ Officeアドインプラットフォームで作成されています。
 
 このとき、以下のいずれかの手順ですぐに定型文で返信することができます。
 
-* メールを表示中のリボンのアドイン->「TypicalReply」グループから、「いいね！」を選択
-  （ボタンが一つしかない場合はTypicalReplyボタンのみが表示される。）
-  !["リボン"](./documents/images/ribbon.PNG "リボン")
 * 閲覧ウィンドウ（ペイン）のアドイン->「TypicalReply」グループから、「いいね！」を選択
-（ボタンが一つしかない場合はTypicalReplyボタンのみが表示される。）
-  !["閲覧ウィンドウ（ペイン）"](./documents/images/message-reading-pain.PNG "閲覧ウィンドウ（ペイン）")
+ * ボタンが一つしかない場合はTypicalReplyボタンのみが表示されます
+
+!["閲覧ウィンドウ（ペイン）"](./documents/images/message-reading-pain.PNG "閲覧ウィンドウ（ペイン）")
+
+* メールを表示中のリボンのアドイン->「TypicalReply」グループから、「いいね！」を選択
+  * Officeアドインの制約より、リボンのアドインはOutlook on the web、新しいOutlookでは動作しません
+  * ボタンが一つしかない場合はTypicalReplyボタンのみが表示されます
+
+!["リボン"](./documents/images/ribbon.PNG "リボン")
 
 ```
 Subject:
