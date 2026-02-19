@@ -297,10 +297,28 @@ export class OfficeDataAccessHelper {
     });
   }
 
-  static setBodyAsync(body) {
+  static getBodyTypeAsync() {
     return new Promise((resolve, reject) => {
       try {
-        Office.context.mailbox.item.body.setAsync(body, (asyncResult) => {
+        Office.context.mailbox.item.body.getTypeAsync((asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            resolve(asyncResult.value);
+          } else {
+            console.log(`Error while getting body type: ${asyncResult.error.message}`);
+            reject(false);
+          }
+        });
+      } catch (error) {
+        console.log(`Error while getting body type: ${error}`);
+        reject(error);
+      }
+    });
+  }
+
+  static setBodyAsync(body, coercionType = Office.CoercionType.Html) {
+    return new Promise((resolve, reject) => {
+      try {
+        Office.context.mailbox.item.body.setAsync(body, { coercionType }, (asyncResult) => {
           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
             resolve(true);
           } else {
@@ -315,10 +333,10 @@ export class OfficeDataAccessHelper {
     });
   }
 
-  static prependBodyAsync(body) {
+  static prependBodyAsync(body, coercionType = Office.CoercionType.Html) {
     return new Promise((resolve, reject) => {
       try {
-        Office.context.mailbox.item.body.prependAsync(body, (asyncResult) => {
+        Office.context.mailbox.item.body.prependAsync(body, { coercionType }, (asyncResult) => {
           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
             resolve(true);
           } else {

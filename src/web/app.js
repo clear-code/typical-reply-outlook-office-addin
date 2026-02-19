@@ -62,6 +62,18 @@ async function onTypicalReplyButtonClicked(event) {
 }
 window.onTypicalReplyButtonClicked = onTypicalReplyButtonClicked;
 
+function plainTextToHtml(text) {
+  if (!text) return "";
+
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+    .replace(/\n/g, "<br>");
+}
+
 async function onNewMessageComposeCreated(event) {
   const conversationId = Office.context.mailbox.item.conversationId;
   const buttonConfigString = Office.context.roamingSettings.get("buttonconfig")?.trim() ?? "";
@@ -95,7 +107,15 @@ async function onNewMessageComposeCreated(event) {
     await OfficeDataAccessHelper.setBodyAsync("");
   }
   if (buttonConfig.body) {
-    await OfficeDataAccessHelper.prependBodyAsync(`${buttonConfig.body} \n`);
+    const coercionType = await OfficeDataAccessHelper.getBodyTypeAsync();
+    let prependBody = `${buttonConfig.body} \n`;
+    if (coercionType === Office.CoercionType.Html) {
+      prependBody = plainTextToHtml(prependBody);
+    }
+    await OfficeDataAccessHelper.prependBodyAsync(prependBody, coercionType);
+    const body = await OfficeDataAccessHelper.getBodyAsync();
+    // prependBodyAsync sometimes does not update the body immediately, so we set body again to make sure the body is updated.
+    await OfficeDataAccessHelper.setBodyAsync(body, coercionType);
   }
   event.completed();
 }
