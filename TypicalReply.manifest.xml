@@ -103,23 +103,19 @@
           <bt:Url id="residUILessFunctionJsFileUrl" DefaultValue="https://127.0.0.1:10042/app.js" ></bt:Url>
         </bt:Urls>
         <bt:ShortStrings>
-          <bt:String id="CommandsGroup.Label" DefaultValue="SPAM Report"/>
-          <bt:String id="TypicalReplyButton.Label" DefaultValue="Send Report">
-            <bt:Override Locale="en-US" Value="Send Report"/>
-            <bt:Override Locale="ja-JP" Value="Send Report"/>
-            <bt:Override Locale="zh-CN" Value="发送报告"/>
+          <bt:String id="CommandsGroup.Label" DefaultValue="TypicalReply">
+            <bt:Override Locale="ja-JP" Value="定型返信"/>
           </bt:String>
-          <bt:String id="TypicalReplyButton.SupertipTitle" DefaultValue="Send Report">
-            <bt:Override Locale="en-US" Value="Send Report"/>
-            <bt:Override Locale="ja-JP" Value="Send Report"/>
-            <bt:Override Locale="zh-CN" Value="T发送报告"/>
+          <bt:String id="TypicalReplyButton.Label" DefaultValue="Like!">
+            <bt:Override Locale="ja-JP" Value="いいね！"/>
+          </bt:String>
+          <bt:String id="TypicalReplyButton.SupertipTitle" DefaultValue="Like!">
+            <bt:Override Locale="ja-JP" Value="いいね！"/>
           </bt:String>
         </bt:ShortStrings>
         <bt:LongStrings>
-          <bt:String id="TypicalReplyButton.SupertipText" DefaultValue="Send Report as suspicious email">
-            <bt:Override Locale="en-US" Value="Send Report as suspicious email"/>
-            <bt:Override Locale="ja-JP" Value="不審メール報告"/>
-            <bt:Override Locale="zh-CN" Value="可疑邮件报告"/>
+          <bt:String id="TypicalReplyButton.SupertipText" DefaultValue="Reply to this email with a Like!">
+            <bt:Override Locale="ja-JP" Value="このメールにいいね！を送る"/>
           </bt:String>
         </bt:LongStrings>
       </Resources>
