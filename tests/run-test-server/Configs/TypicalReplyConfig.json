@@ -8,7 +8,7 @@
                     "Id": "msgReadTypicalReply",
                     "Label": "いいね！",
                     "SubjectPrefix": "[[いいね！]]",
-                    "Body": "いいね！",
+                    "Body": "いいね！\n\n改行",
                     "Recipients": [
                         "all"
                     ],
@@ -28,7 +28,7 @@
                     "Id": "msgReadTypicalReply",
                     "Label": "Like!",
                     "SubjectPrefix": "[[Like!]]",
-                    "Body": "Like!",
+                    "Body": "Like!\n\nNew Line",
                     "Recipients": [
                         "all"
                     ],
