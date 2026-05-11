@@ -118,16 +118,18 @@ Config: 各言語ごとの設定
 
 
 ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定を行う。
-| 設定名         | 型             | 必須 | 省略時のデフォルト   | 概要                                                                                                                                                                                        | 例                                        |
-| -------------- | -------------- | ---- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| Id             | 文字列         | yes  | -                    | ボタンのID。ButtonConfigList内で重複不可。                                                                                                                                                  | `"LikeId"`                                |
-| SubjectPrefix  | 文字列         | no   | null                 | 件名の先頭に挿入する文言                                                                                                                                                                    | `"[[いいね]]"`                            |
-| Subject        | 文字列         | no   | 返信のデフォルト件名 | 件名                                                                                                                                                                                        | `"報告"`                                  |
-| Body           | 文字列         | no   | null                 | 本文                                                                                                                                                                                        | `"いいね"`                                |
-| Recipients     | 文字列のリスト | no   | 送信先なし           | 送信先。<br>`["blank"]`: 送信先なし<br> `["all"]`: 全員に返信<br>`["sender"]`: 送信者にだけ返信<br>その他の文字列リスト: 指定のアドレスに返信                                               | `["test@test.co.jp", "test2@test.co.jp"]` |
-| QuoteType      | boolean        | no   | false                | 元の文言を引用するかどうか。 <br> `true`: 引用する<br>`false`: 引用しない                                                                                                                   | `true`                                    |
-| AllowedDomains | 文字列のリスト | no   | 全て許可             | 送信を許可するドメインリスト。このドメイン以外が含まれている場合、返信用メールの作成、送信は行わない。<br>`["*"]`: 全て許可する<br>その他の文字列リスト: 指定したドメインのみ送信を許可する | `["test.co.jp", "test2.co.jp"]`           |
-| ForwardType    | 文字列         | no   | 添付しない           | 元のメールを添付するかどうか。<br>`attachment`: 添付する                                                                                                                                    | `attachment`                              |
+| 設定名          | 型             | 必須 | 省略時のデフォルト   | 概要                                                                                                                                                                                        | 例                                        |
+| ---------------  | -------------- | ---- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Id              | 文字列         | yes  | -                    | ボタンのID。ButtonConfigList内で重複不可。                                                                                                                                                  | `"LikeId"`                                |
+| SubjectPrefix   | 文字列         | no   | null                 | 件名の先頭に挿入する文言                                                                                                                                                                    | `"[[いいね]]"`                            |
+| Subject         | 文字列         | no   | 返信のデフォルト件名 | 件名                                                                                                                                                                                        | `"報告"`                                  |
+| Body            | 文字列         | no   | null                 | 本文                                                                                                                                                                                        | `"いいね"`                                |
+| Recipients      | 文字列のリスト | no   | 送信先なし           | 送信先。<br>`["blank"]`: 送信先なし<br> `["all"]`: 全員に返信<br>`["sender"]`: 送信者にだけ返信<br>その他の文字列リスト: 指定のアドレスに返信                                               | `["test@test.co.jp", "test2@test.co.jp"]` |
+| QuoteType       | boolean        | no   | false                | 元の文言を引用するかどうか。 <br> `true`: 引用する<br>`false`: 引用しない                                                                                                                   | `true`                                    |
+| AllowedDomains  | 文字列のリスト | no   | 全て許可             | 送信を許可するドメインリスト。このドメイン以外が含まれている場合、返信用メールの作成、送信は行わない。<br>`["*"]`: 全て許可する<br>その他の文字列リスト: 指定したドメインのみ送信を許可する | `["test.co.jp", "test2.co.jp"]`           |
+| ForwardType     | 文字列         | no   | 添付しない           | 元のメールを添付するかどうか。<br>`attachment`: 添付する                                                                                                                                    | `attachment`                              |
+| TaskPaneMessage | 文字列         | no   | null                | タスクパネルのメッセージ | `"処理中..."` |
+
 
 ## 新しい設定追加の例
 
@@ -201,6 +203,15 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
       </Resources>
 ```
 
+次に、`<bt:Urls>`タグに以下のようなURLを追加します。追加したボタンをクリックしたときに呼び出されるURLを指定します。
+`https://127.0.0.1:10042/app.html`はそのままで、クエリパラメータの`actionId=NewButton`で追加したいIDを指定します。
+
+```
+        <bt:Urls>>
+          <bt:Url id="NewButtonFileUrl" DefaultValue="https://127.0.0.1:10042/app.html?actionId=NewButton" ></bt:Url>
+        </bt:Urls>
+```
+
 次に、`<ExtensionPoint xsi:type="MessageReadCommandSurface">` -> `<OfficeTab id="msgReadTabDefault">` -> `<Group id="msgReadCmdGroup">`配下に`<Control>`タグを追加します。
 
 現在の設定が以下のようになっているとします。
@@ -221,8 +232,9 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
                       <bt:Image size="32" resid="Icon.32x32"/>
                       <bt:Image size="80" resid="Icon.80x80"/>
                     </Icon>
-                    <Action xsi:type="ExecuteFunction">
-                      <FunctionName>onTypicalReplyButtonClicked</FunctionName>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="msgReadTypicalReplyFileUrl"/>
+                      <SupportsMultiSelect>true</SupportsMultiSelect>
                     </Action>
                   </Control>
                 </Group>
@@ -248,11 +260,12 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
                       <bt:Image size="32" resid="Icon.32x32"/>
                       <bt:Image size="80" resid="Icon.80x80"/>
                     </Icon>
-                    <Action xsi:type="ExecuteFunction">
-                      <FunctionName>onTypicalReplyButtonClicked</FunctionName>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="msgReadTypicalReplyFileUrl"/>
+                      <SupportsMultiSelect>true</SupportsMultiSelect>
                     </Action>
                   </Control>
-                  <Control xsi:type="Button" id="newButton">
+                  <Control xsi:type="Button" id="NewButton">
                     <Label resid="NewButton.Label"/>
                     <Supertip>
                       <Title resid="NewButton.SupertipTitle"/>
@@ -263,8 +276,9 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
                       <bt:Image size="32" resid="Icon.32x32"/>
                       <bt:Image size="80" resid="Icon.80x80"/>
                     </Icon>
-                    <Action xsi:type="ExecuteFunction">
-                      <FunctionName>onTypicalReplyButtonClicked</FunctionName>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="NewButtonFileUrl"/>
+                      <SupportsMultiSelect>true</SupportsMultiSelect>
                     </Action>
                   </Control>
                 </Group>
@@ -276,7 +290,7 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
 `<Label resid="NewButton.Label"/>`の`resid`には、前の手順で作成したボタンのラベルのIDを指定します。
 `<Supertip>`->`<Title resid="NewButton.SupertipTitle"/>`の`resid`には、前の手順で作成したボタンのスーパーチップのタイトルのIDを指定します。
 `<Supertip>`->`<Description resid="NewButton.SupertipText"/>`の`resid`には、前の手順で作成したボタンのスーパーチップの説明のIDを指定します。
-`<Action xsi:type="ExecuteFunction">` -> `<FunctionName>onTypicalReplyButtonClicked</FunctionName>`の値は`onTypicalReplyButtonClicked`とします。
+`<Action xsi:type="ShowTaskpane">` -> `<SourceLocation>`の`resid`値は、前の手順で追加したURLの`newButtonFileUrl`とします。
 
 次に、設定ファイル（`%APPDATA%\TypicalReply\TypicalReplyConfig.json`）を編集します。
 
@@ -306,11 +320,11 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
 
 ButtonConfigListにButtonConfigを追加します。
 
-`Id`に先程`<Control>`で追加した`newButton`を指定します。
+`Id`に先程URLで追加した`NewButton`を指定します。
 
 ```
 {
-    "Id": "newButton",
+    "Id": "NewButton",
 }
 ```
 
@@ -319,7 +333,7 @@ ButtonConfigListにButtonConfigを追加します。
 
 ```
 {
-    "Id": "newButton",
+    "Id": "NewButton",
     "SubjectPrefix": "[[最高！]]:"
 }
 ```
@@ -329,7 +343,7 @@ ButtonConfigListにButtonConfigを追加します。
 
 ```
 {
-    "Id": "newButton",
+    "Id": "NewButton",
     "SubjectPrefix": "[[最高！]]:",
     "Body": "最高！",
     "QuoteType": true
@@ -341,7 +355,7 @@ ButtonConfigListにButtonConfigを追加します。
 
 ```
 {
-    "Id": "newButton",
+    "Id": "NewButton",
     "SubjectPrefix": "[[最高！]]:",
     "Body": "最高！",
     "QuoteType": true,
@@ -354,7 +368,7 @@ ButtonConfigListにButtonConfigを追加します。
 
 ```
 {
-    "Id": "newButton",
+    "Id": "NewButton",
     "SubjectPrefix": "[[最高！]]:",
     "Body": "最高！",
     "QuoteType": true,
@@ -386,7 +400,7 @@ ButtonConfigListにButtonConfigを追加します。
                     ]
                 },
                 {
-                    "Id": "newButton",
+                    "Id": "NewButton",
                     "SubjectPrefix": "[[最高！]]:",
                     "Body": "最高！",
                     "QuoteType": true,

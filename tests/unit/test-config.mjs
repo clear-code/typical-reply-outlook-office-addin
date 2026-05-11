@@ -36,6 +36,7 @@ test_TypicalReplyConfig_constructor.parameters = {
                 "*"
               ],
               "ForwardType": "Attachment",
+              "TaskPaneMessage": "定型返信を送信しています..."
             }
           ]
         },
@@ -59,6 +60,7 @@ test_TypicalReplyConfig_constructor.parameters = {
               allowedDomains: ["*"],
               allowedDomainsType: 1,
               forwardType: 1,
+              taskPaneMessage: "定型返信を送信しています..."
             },
           ],
         },
@@ -89,6 +91,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: [],
       allowedDomainsType: 1,
       forwardType: 0,
+      taskPaneMessage: "",
     },
   },
   "full": {
@@ -105,6 +108,7 @@ test_ButtonConfig_constructor.parameters = {
         "*"
       ],
       "ForwardType": "Attachment",
+      "TaskPaneMessage": "定型返信を送信しています..."
     },
     expected: {
       id: "button1",
@@ -119,6 +123,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: ["*"],
       allowedDomainsType: 1,
       forwardType: 1,
+      taskPaneMessage: "定型返信を送信しています..."
     }
   },
   "parse ForwardType Inline": {
@@ -136,6 +141,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: [],
       allowedDomainsType: 1,
       forwardType: 2,
+      taskPaneMessage: "",
     }
   },
   "parse RecipientsType Blank": {
@@ -153,6 +159,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: [],
       allowedDomainsType: 1,
       forwardType: 0,
+      taskPaneMessage: "",
     }
   },
   "parse RecipientsType Sender": {
@@ -170,6 +177,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: [],
       allowedDomainsType: 1,
       forwardType: 0,
+      taskPaneMessage: "",
     }
   },
   "parse RecipientsType All": {
@@ -187,6 +195,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: [],
       allowedDomainsType: 1,
       forwardType: 0,
+      taskPaneMessage: "",
     }
   },
   "parse RecipientsType SpecifiedByUser": {
@@ -204,6 +213,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: [],
       allowedDomainsType: 1,
       forwardType: 0,
+      taskPaneMessage: "",
     }
   },
   "parse AllowedDomainsType All": {
@@ -221,6 +231,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: ["*"],
       allowedDomainsType: 1,
       forwardType: 0,
+      taskPaneMessage: "",
     }
   },
   "parse AllowedDomainsType SpecifiedByUser": {
@@ -238,6 +249,7 @@ test_ButtonConfig_constructor.parameters = {
       allowedDomains: ["example.com"],
       allowedDomainsType: 2,
       forwardType: 0,
+      taskPaneMessage: "",
     }
   },
 }

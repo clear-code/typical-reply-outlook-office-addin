@@ -18,6 +18,7 @@ module.exports = async (env, options) => {
     devtool: "source-map",
     entry: {
       app: ["./src/web/app.js"],
+      messagecompose: ["./src/web/messagecompose.js"],
     },
     output: {
       clean: true,
@@ -51,6 +52,11 @@ module.exports = async (env, options) => {
         filename: "app.html",
         template: "./src/web/app.html",
         chunks: ["app"],
+      }),
+      new HtmlWebpackPlugin({
+        filename: "messagecompose.html",
+        template: "./src/web/messagecompose.html",
+        chunks: ["messagecompose"],
       }),
       new CopyWebpackPlugin({
         patterns: [
