@@ -17,7 +17,7 @@ module.exports = async (env, options) => {
   const config = {
     devtool: "source-map",
     entry: {
-      app: ["./src/web/taskpane.js"],
+      taskpane: ["./src/web/taskpane.js"],
       messagecompose: ["./src/web/messagecompose.js"],
     },
     output: {
@@ -51,7 +51,7 @@ module.exports = async (env, options) => {
       new HtmlWebpackPlugin({
         filename: "taskpane.html",
         template: "./src/web/taskpane.html",
-        chunks: ["app"],
+        chunks: ["taskpane"],
       }),
       new HtmlWebpackPlugin({
         filename: "messagecompose.html",
