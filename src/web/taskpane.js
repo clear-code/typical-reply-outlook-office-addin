@@ -11,7 +11,7 @@ import { OfficeDataAccessHelper } from "./office-data-access-helper.mjs";
 import { ButtonConfigEnums } from "./config.mjs";
 
 const _runtimeId = Math.random().toString(36).slice(2, 8);
-console.log("app.js module evaluated, runtimeId:", _runtimeId);
+console.log("taskpane.js module evaluated, runtimeId:", _runtimeId);
 
 const TYPICALREPLY_DEDUPE_KEY = "typicalReply.lastInvocationAt";
 const TYPICALREPLY_DEDUPE_WINDOW_MS = 2000;

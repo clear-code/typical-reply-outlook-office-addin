@@ -30,7 +30,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://127.0.0.1:10042/app.html" />
+        <SourceLocation DefaultValue="https://127.0.0.1:10042/taskpane.html" />
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -100,7 +100,7 @@
       </bt:Images>
         <bt:Urls>
            <!-- The JavaScript code is hosted on a secure and trusted web server. -->
-          <bt:Url id="msgReadTypicalReplyFileUrl" DefaultValue="https://127.0.0.1:10042/app.html?actionId=msgReadTypicalReply" ></bt:Url>
+          <bt:Url id="msgReadTypicalReplyFileUrl" DefaultValue="https://127.0.0.1:10042/taskpane.html?actionId=msgReadTypicalReply" ></bt:Url>
           <bt:Url id="composeFunctionFileUrl" DefaultValue="https://127.0.0.1:10042/messagecompose.html" ></bt:Url>
           <bt:Url id="composeFunctionJsFileUrl" DefaultValue="https://127.0.0.1:10042/messagecompose.js" ></bt:Url>
         </bt:Urls>

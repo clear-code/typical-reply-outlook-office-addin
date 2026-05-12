@@ -204,11 +204,11 @@ ButtonConfig: 定型返信ボタン設定。返信内容や返信先等の設定
 ```
 
 次に、`<bt:Urls>`タグに以下のようなURLを追加します。追加したボタンをクリックしたときに呼び出されるURLを指定します。
-`https://127.0.0.1:10042/app.html`はそのままで、クエリパラメータの`actionId=NewButton`で追加したいIDを指定します。
+`https://127.0.0.1:10042/taskpane.html`はそのままで、クエリパラメータの`actionId=NewButton`で追加したいIDを指定します。
 
 ```
         <bt:Urls>>
-          <bt:Url id="NewButtonFileUrl" DefaultValue="https://127.0.0.1:10042/app.html?actionId=NewButton" ></bt:Url>
+          <bt:Url id="NewButtonFileUrl" DefaultValue="https://127.0.0.1:10042/taskpane.html?actionId=NewButton" ></bt:Url>
         </bt:Urls>
 ```
 
