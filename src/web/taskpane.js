@@ -10,31 +10,8 @@ import { ReplayMailDataCreator } from "./mail-data-creator.mjs";
 import { OfficeDataAccessHelper } from "./office-data-access-helper.mjs";
 import { ButtonConfigEnums } from "./config.mjs";
 
-const _runtimeId = Math.random().toString(36).slice(2, 8);
-console.log("taskpane.js module evaluated, runtimeId:", _runtimeId);
-
-const TYPICALREPLY_DEDUPE_KEY = "typicalReply.lastInvocationAt";
-const TYPICALREPLY_DEDUPE_WINDOW_MS = 2000;
-
-function tryClaimInvocation() {
-  try {
-    const last = parseInt(localStorage.getItem(TYPICALREPLY_DEDUPE_KEY) || "0", 10);
-    const now = Date.now();
-    if (now - last < TYPICALREPLY_DEDUPE_WINDOW_MS) {
-      return false;
-    }
-    localStorage.setItem(TYPICALREPLY_DEDUPE_KEY, String(now));
-    return true;
-  } catch {
-    return true;
-  }
-}
 
 Office.onReady(() => {
-  if (!tryClaimInvocation()) {
-    console.log("Skipped duplicate onTypicalReplyButtonClicked invocation, runtimeId:", _runtimeId);
-    return;
-  }
   onTypicalReplyButtonClicked();
 });
 
@@ -98,6 +75,7 @@ async function loadSelectedMails() {
     console.log("Too many selected items.");
     return null;
   }
+  console.debug("selectedItems dump:", JSON.stringify(selectedItems, null, 2));
   // loadItemByIdAsync must run serially (unloadAsync between loads), so fill
   // in missing internetMessageId / dateTimeCreated one item at a time.
   for (const item of selectedItems) {
@@ -118,7 +96,6 @@ async function loadSelectedMails() {
   const seenDedupeKeys = new Set();
   selectedItems = selectedItems.filter((item) => {
     const key = getDedupeKey(item);
-    console.log(key);
     if (seenDedupeKeys.has(key))
     {
         return false;
@@ -126,6 +103,7 @@ async function loadSelectedMails() {
     seenDedupeKeys.add(key);
     return true;
   });
+  console.debug("deduplicated selectedItems dump:", JSON.stringify(selectedItems, null, 2));
   return selectedItems.map((item) => ({
     toRecipients: item.to,
     ccRecipients: item.cc,
