@@ -10,7 +10,6 @@ import { ReplayMailDataCreator } from "./mail-data-creator.mjs";
 import { OfficeDataAccessHelper } from "./office-data-access-helper.mjs";
 import { ButtonConfigEnums } from "./config.mjs";
 
-
 Office.onReady(() => {
   onTypicalReplyButtonClicked();
 });
@@ -51,59 +50,71 @@ async function singleMailHandler(buttonConfig) {
   );
 }
 
-function getDedupeKey(item) {
+function groupKeyFor(item) {
+  if (!item.conversationId) return null;
+  return `${item.conversationId}|${item.subject ?? ""}`;
+}
+
+function getDedupeKey(item, canonicalImidByGroup) {
   if (item.internetMessageId) {
     return `imid:${item.internetMessageId}`;
   }
-  if (item.conversationId && item.dateTimeCreated) {
-    const created =
-      item.dateTimeCreated instanceof Date
-        ? item.dateTimeCreated.toISOString()
-        : String(item.dateTimeCreated);
-    return `conv:${item.conversationId}|created:${created}`;
+  const gk = groupKeyFor(item);
+  if (gk && canonicalImidByGroup?.has(gk)) {
+    return `imid:${canonicalImidByGroup.get(gk)}`;
+  }
+  if (gk) {
+    return `conv:${gk}`;
   }
   return `id:${item.itemId}`;
 }
 
 async function loadSelectedMails() {
+  // As Office addin specification, selected items length is at most 100, so it is safe to load all selected items into memory.
   let selectedItems = await OfficeDataAccessHelper.getSelectedItemsAsync();
   if (selectedItems == null || selectedItems.length === 0) {
     console.log("No selected items found.");
     return null;
   }
-  if (selectedItems.length > 100) {
-    console.log("Too many selected items.");
-    return null;
-  }
-  console.debug("selectedItems dump:", JSON.stringify(selectedItems, null, 2));
+  console.debug(`Selected items count: ${selectedItems.length}`);
   // loadItemByIdAsync must run serially (unloadAsync between loads), so fill
   // in missing internetMessageId / dateTimeCreated one item at a time.
-  for (const item of selectedItems) {
-    if (!item.itemId) continue;
-    if (item.internetMessageId && item.dateTimeCreated) continue;
-    const ewsId = Office.context.mailbox.convertToEwsId(
-      item.itemId,
-      Office.MailboxEnums.RestVersion.v2_0
-    );
-    const loaded = await OfficeDataAccessHelper.loadItemPropertiesByIdAsync(ewsId);
-    if (loaded?.internetMessageId && !item.internetMessageId) {
-      item.internetMessageId = loaded.internetMessageId;
+  if (Office.context.requirements.isSetSupported("Mailbox", "1.15")) {
+    for (const item of selectedItems) {
+      if (!item.itemId) continue;
+      if (item.internetMessageId && item.dateTimeCreated) continue;
+      const ewsId = Office.context.mailbox.convertToEwsId(
+        item.itemId,
+        Office.MailboxEnums.RestVersion.v2_0
+      );
+      const loaded = await OfficeDataAccessHelper.loadItemPropertiesByIdAsync(ewsId);
+      if (loaded?.internetMessageId && !item.internetMessageId) {
+        item.internetMessageId = loaded.internetMessageId;
+      }
     }
-    if (loaded?.dateTimeCreated && !item.dateTimeCreated) {
-      item.dateTimeCreated = loaded.dateTimeCreated;
+  }
+  // Collect a representative internetMessageId per (conversationId, subject) group, so siblings
+  // "without Message-ID" use it. Note that siblings with Message-ID use its own Message-ID as the key,
+  // so they won't be grouped together, that's an intended behavior because if Message-IDs are present,
+  // they should be used for grouping.
+  const canonicalImidByGroup = new Map();
+  for (const item of selectedItems) {
+    if (!item.internetMessageId) continue;
+    const gk = groupKeyFor(item);
+    if (!gk) continue;
+    if (!canonicalImidByGroup.has(gk)) {
+      canonicalImidByGroup.set(gk, item.internetMessageId);
     }
   }
   const seenDedupeKeys = new Set();
   selectedItems = selectedItems.filter((item) => {
-    const key = getDedupeKey(item);
-    if (seenDedupeKeys.has(key))
-    {
-        return false;
+    const key = getDedupeKey(item, canonicalImidByGroup);
+    if (seenDedupeKeys.has(key)) {
+      return false;
     }
     seenDedupeKeys.add(key);
     return true;
   });
-  console.debug("deduplicated selectedItems dump:", JSON.stringify(selectedItems, null, 2));
   return selectedItems.map((item) => ({
     toRecipients: item.to,
     ccRecipients: item.cc,
@@ -117,32 +128,38 @@ async function loadSelectedMails() {
 async function multiMailHandler(buttonConfig) {
   // For multi-select with reading pane, we can not use "reply" or "replay all", we can only create a new mail,
   // and original recipients should not be specified to the new mail recipients because it is insecure.
-  if (buttonConfig.recipientsType !== ButtonConfigEnums.RecipientsType.SpecifiedByUser) {
+  if (
+    buttonConfig.recipientsType !== ButtonConfigEnums.RecipientsType.SpecifiedByUser &&
+    buttonConfig.recipientsType !== ButtonConfigEnums.RecipientsType.Blank
+  ) {
     console.log(
-      "For multi-select with reading pane, only SpecifiedByUser recipients type is allowed."
+      "For multi-select with reading pane, only SpecifiedByUser or Blank recipients type are allowed."
     );
     Office.context.ui.closeContainer();
     return;
   }
 
-  const originalMailDataList = await loadSelectedMails();
-  if (!originalMailDataList || originalMailDataList.length === 0) {
-    console.log("No valid selected mails found.");
+  if (!ReplayMailDataCreator.isAllRecipientsAllowed({ buttonConfig, originalMailData: {} })) {
+    console.log("Recipients contains some prohibited domains");
     Office.context.ui.closeContainer();
     return;
   }
+
   const attachments = [];
-  for (const originalMailData of originalMailDataList) {
-    if (!ReplayMailDataCreator.isAllRecipientsAllowed({ buttonConfig, originalMailData })) {
-      console.log("Recipients contains some prohibited domains");
+  if (buttonConfig.forwardType === ButtonConfigEnums.ForwardType.Attachment) {
+    const originalMailDataList = await loadSelectedMails();
+    if (!originalMailDataList || originalMailDataList.length === 0) {
+      console.log("No valid selected mails found.");
       Office.context.ui.closeContainer();
       return;
     }
-    const attachmentsOfMail = ReplayMailDataCreator.getAttachments({
-      buttonConfig,
-      originalMailData,
-    });
-    attachments.push(...attachmentsOfMail);
+    for (const originalMailData of originalMailDataList) {
+      const attachmentsOfMail = ReplayMailDataCreator.getAttachments({
+        buttonConfig,
+        originalMailData,
+      });
+      attachments.push(...attachmentsOfMail);
+    }
   }
   const subject = ReplayMailDataCreator.createSubject({ buttonConfig, originalSubject: "" });
   const recipients = ReplayMailDataCreator.getNewRecipients(buttonConfig);
@@ -177,12 +194,20 @@ async function onTypicalReplyButtonClicked() {
       element.innerText = buttonConfig.taskPaneMessage;
     }
     element.hidden = false;
-    const item = Office.context.mailbox.item;
-    if (item) {
-      // No reading pane item (e.g. multi-select with no preview) — nothing to reply to
-      await singleMailHandler(buttonConfig);
+    if (Office.context.mailbox.diagnostics?.hostName === "Outlook") {
+      const selectedItems = await loadSelectedMails();
+      if (!selectedItems || selectedItems.length > 1) {
+        await multiMailHandler(buttonConfig);
+      } else {
+        await singleMailHandler(buttonConfig);
+      }
     } else {
-      await multiMailHandler(buttonConfig);
+      const item = Office.context.mailbox.item;
+      if (item) {
+        await singleMailHandler(buttonConfig);
+      } else {
+        await multiMailHandler(buttonConfig);
+      }
     }
   } catch (e) {
     console.error("onTypicalReplyButtonClicked Failed:", e);

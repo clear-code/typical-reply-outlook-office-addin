@@ -416,7 +416,6 @@ export class OfficeDataAccessHelper {
           const loaded = loadResult.value;
           const properties = {
             internetMessageId: loaded.internetMessageId || "",
-            dateTimeCreated: loaded.dateTimeCreated || null,
           };
           loaded.unloadAsync((unloadResult) => {
             if (unloadResult.status !== Office.AsyncResultStatus.Succeeded) {

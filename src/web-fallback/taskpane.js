@@ -5,5 +5,4 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 Copyright (c) 2026 ClearCode Inc.
 */
-Office.onReady(() => {
-});
+Office.onReady(() => {});
