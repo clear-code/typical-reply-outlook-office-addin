@@ -195,6 +195,10 @@ async function onTypicalReplyButtonClicked() {
     }
     element.hidden = false;
     if (Office.context.mailbox.diagnostics?.hostName === "Outlook") {
+      // On Classic Outlook, Office.context.mailbox.item is always defined,
+      // regardless of whether one or multiple messages are selected.
+      // So we need to check the number of selected items to determine whether
+      // it is single-select or multi-select.
       const selectedItems = await loadSelectedMails();
       if (!selectedItems || selectedItems.length > 1) {
         await multiMailHandler(buttonConfig);
@@ -202,6 +206,12 @@ async function onTypicalReplyButtonClicked() {
         await singleMailHandler(buttonConfig);
       }
     } else {
+      // On Classic Outlook, Office.context.mailbox.item is defined only when
+      // a single message is selected.
+      // singleMailHandler also requires Office.context.mailbox.item to fetch
+      // the original mail data and to display the reply form. Therefore, when
+      // Office.context.mailbox.item is undefined, the case must be handled by
+      // multiMailHandler, which does not rely on Office.context.mailbox.item.
       const item = Office.context.mailbox.item;
       if (item) {
         await singleMailHandler(buttonConfig);
