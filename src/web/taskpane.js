@@ -206,8 +206,8 @@ async function onTypicalReplyButtonClicked() {
         await singleMailHandler(buttonConfig);
       }
     } else {
-      // On Classic Outlook, Office.context.mailbox.item is defined only when
-      // a single message is selected.
+      // On Outlook on the web and New Outlook, Office.context.mailbox.item is
+      // defined only when a single message is selected.
       // singleMailHandler also requires Office.context.mailbox.item to fetch
       // the original mail data and to display the reply form. Therefore, when
       // Office.context.mailbox.item is undefined, the case must be handled by
