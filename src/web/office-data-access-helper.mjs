@@ -374,10 +374,15 @@ export class OfficeDataAccessHelper {
       try {
         Office.context.mailbox.getSelectedItemsAsync((asyncResult) => {
           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            if (!asyncResult.value || asyncResult.value.length === 0) {
+              console.debug("No items are selected");
+              resolve([]);
+              return;
+            }
             resolve(asyncResult.value);
           } else {
             console.log(`Error while getting selected items: ${asyncResult.error.message}`);
-            reject([]);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
@@ -395,7 +400,7 @@ export class OfficeDataAccessHelper {
             resolve(true);
           } else {
             console.log(`Error while displaying new message: ${asyncResult.error.message}`);
-            reject(false);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
