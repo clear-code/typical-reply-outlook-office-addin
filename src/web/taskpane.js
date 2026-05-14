@@ -55,13 +55,13 @@ function groupKeyFor(item) {
   return `${item.conversationId}|${item.subject ?? ""}`;
 }
 
-function getDedupeKey(item, canonicalImidByGroup) {
+function getDedupeKey(item, canonicalInternetMessageIdByGroup) {
   if (item.internetMessageId) {
     return `imid:${item.internetMessageId}`;
   }
   const gk = groupKeyFor(item);
-  if (gk && canonicalImidByGroup?.has(gk)) {
-    return `imid:${canonicalImidByGroup.get(gk)}`;
+  if (gk && canonicalInternetMessageIdByGroup?.has(gk)) {
+    return `imid:${canonicalInternetMessageIdByGroup.get(gk)}`;
   }
   if (gk) {
     return `conv:${gk}`;
@@ -97,18 +97,18 @@ async function loadSelectedMails() {
   // "without Message-ID" use it. Note that siblings with Message-ID use its own Message-ID as the key,
   // so they won't be grouped together, that's an intended behavior because if Message-IDs are present,
   // they should be used for grouping.
-  const canonicalImidByGroup = new Map();
+  const canonicalInternetMessageIdByGroup = new Map();
   for (const item of selectedItems) {
     if (!item.internetMessageId) continue;
     const gk = groupKeyFor(item);
     if (!gk) continue;
-    if (!canonicalImidByGroup.has(gk)) {
-      canonicalImidByGroup.set(gk, item.internetMessageId);
+    if (!canonicalInternetMessageIdByGroup.has(gk)) {
+      canonicalInternetMessageIdByGroup.set(gk, item.internetMessageId);
     }
   }
   const seenDedupeKeys = new Set();
   selectedItems = selectedItems.filter((item) => {
-    const key = getDedupeKey(item, canonicalImidByGroup);
+    const key = getDedupeKey(item, canonicalInternetMessageIdByGroup);
     if (seenDedupeKeys.has(key)) {
       return false;
     }
