@@ -125,7 +125,7 @@ async function loadSelectedMails() {
   }));
 }
 
-async function multiMailHandler(buttonConfig) {
+async function multiMailHandler(buttonConfig, originalMailDataList) {
   // For multi-select with reading pane, we can not use "reply" or "replay all", we can only create a new mail,
   // and original recipients should not be specified to the new mail recipients because it is insecure.
   if (
@@ -147,7 +147,9 @@ async function multiMailHandler(buttonConfig) {
 
   const attachments = [];
   if (buttonConfig.forwardType === ButtonConfigEnums.ForwardType.Attachment) {
-    const originalMailDataList = await loadSelectedMails();
+    if (!originalMailDataList) {
+      originalMailDataList = await loadSelectedMails();
+    }
     if (originalMailDataList.length === 0) {
       console.log("No valid selected mails found.");
       Office.context.ui.closeContainer();
@@ -201,7 +203,7 @@ async function onTypicalReplyButtonClicked() {
       // it is single-select or multi-select.
       const selectedItems = await loadSelectedMails();
       if (selectedItems.length > 1) {
-        await multiMailHandler(buttonConfig);
+        await multiMailHandler(buttonConfig, selectedItems);
       } else {
         await singleMailHandler(buttonConfig);
       }
@@ -216,7 +218,7 @@ async function onTypicalReplyButtonClicked() {
       if (item) {
         await singleMailHandler(buttonConfig);
       } else {
-        await multiMailHandler(buttonConfig);
+        await multiMailHandler(buttonConfig, null);
       }
     }
   } catch (e) {
