@@ -72,9 +72,9 @@ function getDedupeKey(item, canonicalImidByGroup) {
 async function loadSelectedMails() {
   // As Office addin specification, selected items length is at most 100, so it is safe to load all selected items into memory.
   let selectedItems = await OfficeDataAccessHelper.getSelectedItemsAsync();
-  if (selectedItems == null || selectedItems.length === 0) {
+  if (selectedItems.length === 0) {
     console.log("No selected items found.");
-    return null;
+    return [];
   }
   console.debug(`Selected items count: ${selectedItems.length}`);
   // loadItemByIdAsync must run serially (unloadAsync between loads), so fill
@@ -148,7 +148,7 @@ async function multiMailHandler(buttonConfig) {
   const attachments = [];
   if (buttonConfig.forwardType === ButtonConfigEnums.ForwardType.Attachment) {
     const originalMailDataList = await loadSelectedMails();
-    if (!originalMailDataList || originalMailDataList.length === 0) {
+    if (originalMailDataList.length === 0) {
       console.log("No valid selected mails found.");
       Office.context.ui.closeContainer();
       return;
@@ -200,7 +200,7 @@ async function onTypicalReplyButtonClicked() {
       // So we need to check the number of selected items to determine whether
       // it is single-select or multi-select.
       const selectedItems = await loadSelectedMails();
-      if (!selectedItems || selectedItems.length > 1) {
+      if (selectedItems.length > 1) {
         await multiMailHandler(buttonConfig);
       } else {
         await singleMailHandler(buttonConfig);
