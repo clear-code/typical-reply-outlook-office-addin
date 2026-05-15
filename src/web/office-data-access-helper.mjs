@@ -368,4 +368,71 @@ export class OfficeDataAccessHelper {
       }
     });
   }
+
+  static getSelectedItemsAsync() {
+    return new Promise((resolve, reject) => {
+      try {
+        Office.context.mailbox.getSelectedItemsAsync((asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            if (!asyncResult.value || asyncResult.value.length === 0) {
+              console.debug("No items are selected");
+              resolve([]);
+              return;
+            }
+            resolve(asyncResult.value);
+          } else {
+            console.log(`Error while getting selected items: ${asyncResult.error.message}`);
+            reject(asyncResult.error);
+          }
+        });
+      } catch (error) {
+        console.log(`Error while getting selected items: ${error}`);
+        reject(error);
+      }
+    });
+  }
+
+  static displayNewMessageAsync(parameters) {
+    return new Promise((resolve, reject) => {
+      try {
+        Office.context.mailbox.displayNewMessageFormAsync(parameters, (asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            resolve(true);
+          } else {
+            console.log(`Error while displaying new message: ${asyncResult.error.message}`);
+            reject(asyncResult.error);
+          }
+        });
+      } catch (error) {
+        console.log(`Error while displaying new message: ${error}`);
+        reject(error);
+      }
+    });
+  }
+
+  static loadItemPropertiesByIdAsync(itemId) {
+    return new Promise((resolve) => {
+      try {
+        Office.context.mailbox.loadItemByIdAsync(itemId, (loadResult) => {
+          if (loadResult.status !== Office.AsyncResultStatus.Succeeded) {
+            console.log(`Error while loading item ${itemId}: ${loadResult.error?.message}`);
+            return resolve(null);
+          }
+          const loaded = loadResult.value;
+          const properties = {
+            internetMessageId: loaded.internetMessageId || "",
+          };
+          loaded.unloadAsync((unloadResult) => {
+            if (unloadResult.status !== Office.AsyncResultStatus.Succeeded) {
+              console.log(`Error while unloading item ${itemId}: ${unloadResult.error?.message}`);
+            }
+            resolve(properties);
+          });
+        });
+      } catch (error) {
+        console.log(`Error while loading item ${itemId}: ${error}`);
+        resolve(null);
+      }
+    });
+  }
 }

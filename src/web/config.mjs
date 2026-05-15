@@ -52,6 +52,7 @@ export class ButtonConfig {
   allowedDomains;
   allowedDomainsType;
   forwardType;
+  taskPaneMessage;
 
   constructor({
     Id,
@@ -62,6 +63,7 @@ export class ButtonConfig {
     QuoteType,
     AllowedDomains,
     ForwardType,
+    TaskPaneMessage,
   }) {
     this.id = Id ?? "";
     this.subjectPrefix = SubjectPrefix ?? "";
@@ -70,6 +72,7 @@ export class ButtonConfig {
     this.recipients = Recipients ?? [];
     this.quoteType = QuoteType ?? false;
     this.allowedDomains = AllowedDomains ?? [];
+    this.taskPaneMessage = TaskPaneMessage ?? "";
     this.forwardType =
       getEnumValueByKey(ButtonConfigEnums.ForwardType, ForwardType) ??
       ButtonConfigEnums.ForwardType.Unknown;

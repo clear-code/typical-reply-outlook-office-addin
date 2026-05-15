@@ -18,7 +18,8 @@ module.exports = async (env, options) => {
   const config = {
     devtool: "source-map",
     entry: {
-      app: ["./src/web-fallback/app.js"],
+      taskpane: ["./src/web-fallback/taskpane.js"],
+      messagecompose: ["./src/web-fallback/messagecompose.js"],
     },
     output: {
       path: path.resolve('dist-fallback/'),
@@ -50,9 +51,14 @@ module.exports = async (env, options) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        filename: "app.html",
-        template: "./src/web-fallback/app.html",
-        chunks: ["app"],
+        filename: "taskpane.html",
+        template: "./src/web-fallback/taskpane.html",
+        chunks: ["taskpane"],
+      }),
+      new HtmlWebpackPlugin({
+        filename: "messagecompose.html",
+        template: "./src/web-fallback/messagecompose.html",
+        chunks: ["messagecompose"],
       }),
       new CopyWebpackPlugin({
         patterns: [

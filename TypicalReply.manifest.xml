@@ -30,7 +30,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://127.0.0.1:10042/app.html" />
+        <SourceLocation DefaultValue="https://127.0.0.1:10042/taskpane.html" />
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -45,7 +45,7 @@
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
       <Description resid="residAppDescription" />
       <Requirements>
-        <bt:Sets DefaultMinVersion="1.13">
+        <bt:Sets DefaultMinVersion="1.15">
           <bt:Set Name="Mailbox" />
         </bt:Sets>
       </Requirements>
@@ -53,18 +53,18 @@
         <Host xsi:type="MailHost">
           <Runtimes>
             <!-- HTML file that references the JavaScript event handlers. This is used by Outlook on the web and on Mac, and in new Outlook on Windows. -->
-            <Runtime resid="residUILessFunctionFileUrl">
+            <Runtime resid="composeFunctionFileUrl">
               <!-- JavaScript file that contains the event handlers. This is used by classic Outlook on Windows. -->
-              <Override type="javascript" resid="residUILessFunctionJsFileUrl"/>
+              <Override type="javascript" resid="composeFunctionJsFileUrl"/>
             </Runtime>
           </Runtimes>
           <DesktopFormFactor>
-            <FunctionFile resid="residUILessFunctionFileUrl" />
+            <FunctionFile resid="composeFunctionFileUrl" />
             <ExtensionPoint xsi:type="LaunchEvent">
               <LaunchEvents>
                 <LaunchEvent Type="OnNewMessageCompose" FunctionName="onNewMessageComposeCreated"/>
               </LaunchEvents>
-              <SourceLocation resid="residUILessFunctionFileUrl"/>
+              <SourceLocation resid="composeFunctionFileUrl"/>
             </ExtensionPoint>
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="TabDefault">
@@ -81,8 +81,9 @@
                       <bt:Image size="32" resid="Icon.32x32"/>
                       <bt:Image size="80" resid="Icon.80x80"/>
                     </Icon>
-                    <Action xsi:type="ExecuteFunction">
-                      <FunctionName>onTypicalReplyButtonClicked</FunctionName>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="msgReadTypicalReplyFileUrl"/>
+                      <SupportsMultiSelect>true</SupportsMultiSelect>
                     </Action>
                   </Control>
                 </Group>
@@ -99,8 +100,9 @@
       </bt:Images>
         <bt:Urls>
            <!-- The JavaScript code is hosted on a secure and trusted web server. -->
-          <bt:Url id="residUILessFunctionFileUrl" DefaultValue="https://127.0.0.1:10042/app.html" ></bt:Url>
-          <bt:Url id="residUILessFunctionJsFileUrl" DefaultValue="https://127.0.0.1:10042/app.js" ></bt:Url>
+          <bt:Url id="msgReadTypicalReplyFileUrl" DefaultValue="https://127.0.0.1:10042/taskpane.html?actionId=msgReadTypicalReply" ></bt:Url>
+          <bt:Url id="composeFunctionFileUrl" DefaultValue="https://127.0.0.1:10042/messagecompose.html" ></bt:Url>
+          <bt:Url id="composeFunctionJsFileUrl" DefaultValue="https://127.0.0.1:10042/messagecompose.js" ></bt:Url>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="CommandsGroup.Label" DefaultValue="TypicalReply">
