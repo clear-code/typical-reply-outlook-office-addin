@@ -12,11 +12,16 @@ export class OfficeDataAccessHelper {
     return new Promise((resolve, reject) => {
       try {
         Office.context.mailbox.item.bcc.getAsync((asyncResult) => {
-          const recipients = asyncResult.value.map((officeAddonRecipient) => ({
-            ...officeAddonRecipient,
-            ...RecipientParser.parse(officeAddonRecipient.emailAddress),
-          }));
-          resolve(recipients);
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            const recipients = asyncResult.value.map((officeAddonRecipient) => ({
+              ...officeAddonRecipient,
+              ...RecipientParser.parse(officeAddonRecipient.emailAddress),
+            }));
+            resolve(recipients);
+          } else {
+            console.log(`Error while getting Bcc: ${asyncResult.error.message}`);
+            reject(asyncResult.error);
+          }
         });
       } catch (error) {
         console.log(`Error while getting Bcc: ${error}`);
@@ -47,11 +52,16 @@ export class OfficeDataAccessHelper {
     return new Promise((resolve, reject) => {
       try {
         Office.context.mailbox.item.cc.getAsync((asyncResult) => {
-          const recipients = asyncResult.value.map((officeAddonRecipient) => ({
-            ...officeAddonRecipient,
-            ...RecipientParser.parse(officeAddonRecipient.emailAddress),
-          }));
-          resolve(recipients);
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            const recipients = asyncResult.value.map((officeAddonRecipient) => ({
+              ...officeAddonRecipient,
+              ...RecipientParser.parse(officeAddonRecipient.emailAddress),
+            }));
+            resolve(recipients);
+          } else {
+            console.log(`Error while getting Cc: ${asyncResult.error.message}`);
+            reject(asyncResult.error);
+          }
         });
       } catch (error) {
         console.log(`Error while getting Cc: ${error}`);
@@ -78,16 +88,17 @@ export class OfficeDataAccessHelper {
     });
   }
 
-  static clearCcAsync() {
-    return OfficeDataAccessHelper.setCcAsync([]);
-  }
-
   static getSubjectAsync() {
     return new Promise((resolve, reject) => {
       try {
         Office.context.mailbox.item.subject.getAsync((asyncResult) => {
-          const subject = asyncResult.value;
-          resolve(subject);
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            const subject = asyncResult.value;
+            resolve(subject);
+          } else {
+            console.log(`Error while getting subject: ${asyncResult.error.message}`);
+            reject(asyncResult.error);
+          }
         });
       } catch (error) {
         console.log(`Error while getting subject: ${error}`);
@@ -103,8 +114,13 @@ export class OfficeDataAccessHelper {
           coerctionType,
           { bodyMode: Office.MailboxEnums.BodyMode.Full },
           (asyncResult) => {
-            const body = asyncResult.value;
-            resolve(body);
+            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+              const body = asyncResult.value;
+              resolve(body);
+            } else {
+              console.log(`Error while getting body: ${asyncResult.error.message}`);
+              reject(asyncResult.error);
+            }
           }
         );
       } catch (error) {
@@ -114,76 +130,20 @@ export class OfficeDataAccessHelper {
     });
   }
 
-  static getItemIdAsync() {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.getItemIdAsync((asyncResult) => {
-          const id = asyncResult.value;
-          resolve(id);
-        });
-      } catch (error) {
-        console.log(`Error while getting itemId: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
-  static loadCustomPropertiesAsync() {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.loadCustomPropertiesAsync((asyncResult) => {
-          resolve(asyncResult.value);
-        });
-      } catch (error) {
-        console.log(`Error while getting itemId: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
-  static getRequiredAttendeeAsync() {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.requiredAttendees.getAsync((asyncResult) => {
-          const recipients = asyncResult.value.map((officeAddonRecipient) => ({
-            ...officeAddonRecipient,
-            ...RecipientParser.parse(officeAddonRecipient.emailAddress),
-          }));
-          resolve(recipients);
-        });
-      } catch (error) {
-        console.log(`Error while getting required attendees: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
-  static getOptionalAttendeeAsync() {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.optionalAttendees.getAsync((asyncResult) => {
-          const recipients = asyncResult.value.map((officeAddonRecipient) => ({
-            ...officeAddonRecipient,
-            ...RecipientParser.parse(officeAddonRecipient.emailAddress),
-          }));
-          resolve(recipients);
-        });
-      } catch (error) {
-        console.log(`Error while getting optional attendees: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
   static getToAsync() {
     return new Promise((resolve, reject) => {
       try {
         Office.context.mailbox.item.to.getAsync((asyncResult) => {
-          const recipients = asyncResult.value.map((officeAddonRecipient) => ({
-            ...officeAddonRecipient,
-            ...RecipientParser.parse(officeAddonRecipient.emailAddress),
-          }));
-          resolve(recipients);
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            const recipients = asyncResult.value.map((officeAddonRecipient) => ({
+              ...officeAddonRecipient,
+              ...RecipientParser.parse(officeAddonRecipient.emailAddress),
+            }));
+            resolve(recipients);
+          } else {
+            console.log(`Error while getting To: ${asyncResult.error.message}`);
+            reject(asyncResult.error);
+          }
         });
       } catch (error) {
         console.log(`Error while getting To: ${error}`);
@@ -214,71 +174,6 @@ export class OfficeDataAccessHelper {
     return OfficeDataAccessHelper.setToAsync([]);
   }
 
-  static getSessionDataAsync(key) {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.sessionData.getAsync(key, (asyncResult) => {
-          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-            resolve(asyncResult.value);
-          } else {
-            console.debug(`Error while getting SessionData [${key}]: ${asyncResult.error.message}`);
-            // Regards no value
-            resolve("");
-          }
-        });
-      } catch (error) {
-        console.log(`Error while getting SessionData [${key}]: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
-  static getDelayDeliveryTime() {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.delayDeliveryTime.getAsync((asyncResult) => {
-          const value = asyncResult.value;
-          resolve(value);
-        });
-      } catch (error) {
-        console.log(`Error while getting DelayDeliveryTime: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
-  static getInitializationContextAsync() {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.getInitializationContextAsync((asyncResult) => {
-          const value = asyncResult.value.itemId;
-          resolve(value);
-        });
-      } catch (error) {
-        console.log(`Error while getting getInitializationContextAsync: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
-  static setDelayDeliveryTimeAsync(deliveryTime) {
-    return new Promise((resolve, reject) => {
-      try {
-        Office.context.mailbox.item.delayDeliveryTime.setAsync(deliveryTime, (asyncResult) => {
-          if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-            console.log(asyncResult.error.message);
-            resolve(false);
-          } else {
-            resolve(true);
-          }
-        });
-      } catch (error) {
-        console.log(`Error while setting DelayDeliveryTime: ${error}`);
-        reject(error);
-      }
-    });
-  }
-
   static setSubjectAsync(subject) {
     return new Promise((resolve, reject) => {
       try {
@@ -287,7 +182,7 @@ export class OfficeDataAccessHelper {
             resolve(true);
           } else {
             console.log(`Error while setting subject: ${asyncResult.error.message}`);
-            reject(false);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
@@ -305,7 +200,7 @@ export class OfficeDataAccessHelper {
             resolve(asyncResult.value);
           } else {
             console.log(`Error while getting body type: ${asyncResult.error.message}`);
-            reject(false);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
@@ -323,7 +218,7 @@ export class OfficeDataAccessHelper {
             resolve(true);
           } else {
             console.log(`Error while setting body: ${asyncResult.error.message}`);
-            reject(false);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
@@ -341,7 +236,7 @@ export class OfficeDataAccessHelper {
             resolve(true);
           } else {
             console.log(`Error while prepending body: ${asyncResult.error.message}`);
-            reject(false);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
@@ -359,7 +254,7 @@ export class OfficeDataAccessHelper {
             resolve(true);
           } else {
             console.log(`Error while saving RoamingSettings: ${asyncResult.error.message}`);
-            reject(false);
+            reject(asyncResult.error);
           }
         });
       } catch (error) {
