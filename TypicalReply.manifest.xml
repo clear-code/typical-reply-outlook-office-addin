@@ -7,7 +7,7 @@
   xsi:type="MailApp">
 
   <Id>20ecd0b2-4157-492b-8d0b-475b729f48ec</Id>
-  <Version>1.1.0.1</Version>
+  <Version>1.1.0.2</Version>
   <ProviderName>ClearCode</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="TypicalReply"/>
@@ -43,9 +43,8 @@
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
     <!-- On Send requires VersionOverridesV1_1 -->
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
-      <Description resid="residAppDescription" />
       <Requirements>
-        <bt:Sets DefaultMinVersion="1.14">
+        <bt:Sets DefaultMinVersion="1.13">
           <bt:Set Name="Mailbox" />
         </bt:Sets>
       </Requirements>
